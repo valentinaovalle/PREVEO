@@ -29,4 +29,4 @@ COPY . .
 # For environments with multiple CPU cores, increase the number of workers
 # to be equal to the cores available.
 #CMD exec uvicorn main:app --host 0.0.0.0 --port $PORT --workers 2 
-CMD streamlit run dash.py --server.port $PORT
+CMD streamlit run app.py --server.port $PORT

@@ -8,7 +8,7 @@ import datetime
 #import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-#from io import BytesIO
+from io import BytesIO
 from pyxlsb import open_workbook as open_xlsb
 from PIL import Image
 import os

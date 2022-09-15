@@ -16,7 +16,7 @@ import cargar
 import datatable as dt
 from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode
 import markdown
-from typing import List, Optional
+#from typing import List, Optional
 #from tkinter import * from tkinter.ttk import *
 
 cost_center, employees, data,tip_nov =cargar.cargar_info()

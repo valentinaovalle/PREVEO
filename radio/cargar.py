@@ -66,5 +66,14 @@ def cargar_info():
     dict_data = eval(trans_data)
     data = pd.DataFrame(dict_data['data'])
     
+    response = requests.get(f"{BASE_URL}/api/v1/expense_reimbursement", headers=headers)
+    trans_data = _normalize(response.text)
+    dict_data = eval(trans_data)
+    df = pd.DataFrame(dict_data['data'])
+    
+    response = requests.get(f"{BASE_URL}/api/v1/loan", headers=headers)
+    trans_data = _normalize(response.text)
+    dict_data = eval(trans_data)
+    pr = pd.DataFrame(dict_data['data'])
 
-    return cost_center, employees, data, tip_nov
+    return cost_center, employees, data, tip_nov ,df, pr

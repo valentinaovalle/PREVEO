@@ -2,7 +2,16 @@ import requests
 import pandas as pd
 import os
 import streamlit as st
+import requests
+import shutil
 
+def download_file(url):
+    local_filename = 'Reporte Novedades.xlsx'
+    with requests.get(url, stream=True) as r:
+        with open(local_filename, 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+
+    return local_filename
 
 BASE_URL = st.secrets["API_PROD"] if st.secrets.get("PROD",False) else st.secrets["API_DEV"]
 
@@ -77,3 +86,9 @@ def cargar_info():
     pr = pd.DataFrame(dict_data['data'])
 
     return cost_center, employees, data, tip_nov ,df, pr
+
+def descargar():
+    url = f"{BASE_URL}/api/v1/spreadsheet"
+    return download_file(url)
+    
+   

@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import time
 import plotly.express as px
 import datetime
 #import matplotlib
@@ -9,23 +8,17 @@ import datetime
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from io import BytesIO
-from pyxlsb import open_workbook as open_xlsb
 from PIL import Image
 import os
 import cargar
 import datatable as dt
 from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode
 import markdown
-import gspread
 
-import pickle
-from pathlib import Path
-
-import streamlit_authenticator as stauth 
 
 #from typing import List, Optional
 #from tkinter import * from tkinter.ttk import *
-def main():
+def main(opt):
     
 
     cost_center, employees, data,tip_nov, df, pr =cargar.cargar_info()
@@ -64,7 +57,7 @@ def main():
     men=df.groupby(['fecha_de_pago'],as_index=False)['valor_rembolso'].sum
     #-----------------------------------------------------------------------------
     #data = pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/LUCRO/prueba.xlsx")
-    data=data.drop(["codigo_centro_de_costos","observaciones"],axis=1) 
+    data=data.drop(["codigo_centro_de_costos"],axis=1) 
     data.columns = data.columns.str.replace(' ', '_') 
     data['fecha_inicial_novedad'] = pd.to_datetime(data['fecha_inicial_novedad'], errors='coerce')
     data['fecha_final_novedad'] = pd.to_datetime(data['fecha_final_novedad'], errors='coerce')
@@ -88,8 +81,12 @@ def main():
     Por_tra = (Lab['dias_laborados']/30)*100
     Lab['Por_tra']=Por_tra   
     #-----------------------------------------------------------------------------
-    cm=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/CAJA_MENOR/cm.xlsx")
-    cm['año_mes']=cm['fecha_de_elaboracion'].dt.strftime('%Y-%m')
+    url='https://drive.google.com/file/d/1SYecV7Sm7NOarvSg6uAoZSgRdRcECLua/view?usp=sharing'
+    url='https://drive.google.com/uc?id=' + url.split('/')[-2]
+    cm = pd.read_csv(url,sep=';')
+    #cm=pd.read_excel("https://docs.google.com/spreadsheets/d/1dxWGKibM_6n5llwR68zUxVuxQ8AAKn2T/edit?usp=sharing&ouid=112502888078542287829&rtpof=true&sd=true")
+  
+    cm['año_mes']=pd.to_datetime(cm['fecha_de_elaboracion'],format='%d/%m/%Y')
     cantcm=cm.groupby(['cargar_a_centro_de_costos','año_mes'],as_index=False)['total'].sum()
     contarcm=cm.groupby(['cargar_a_centro_de_costos'],as_index=False)['total'].count()
     reemcm=cm.groupby(['nombres_y_apellidos','numero_cc','cargar_a_centro_de_costos'],as_index=False)['total'].sum()
@@ -226,8 +223,11 @@ def main():
         def cc():
             st.header('CENTROS DE COSTOS')
             cost_center, employees, data,tip_nov, df, pr =cargar.cargar_info()
+            url='https://drive.google.com/file/d/1PLqE00MJbjR_P9f64-AAd1NeFw0gPFIr/view?usp=sharing'
+            url='https://drive.google.com/uc?id=' + url.split('/')[-2]
+            cost_center = pd.read_csv(url,sep=';')
             
-            cost_center=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/COST_CENTER/cc.xlsx")
+            #cost_center=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/COST_CENTER/cc.xlsx")
             cost_center=cost_center.fillna('No_Aplica')
             cost_center['vigencia_del_proyecto'] = cost_center['vigencia_del_proyecto'].replace(
              { "NO": 'NO_VIGENTE'})
@@ -495,13 +495,26 @@ def main():
          
          #dataf=tipo[(tipo.Aprobado == taps)]
          
-         dataf[['nombre_del_empleado','documento_de_identificacion','centro_de_costos','dias_laborados','año_mes','tipo_de_novedad','Alerta']]
+         dataf[['nombre_del_empleado','documento_de_identificacion','centro_de_costos',
+                'dias_laborados','año_mes','tipo_de_novedad','Alerta']]
+      
+         dataf=dataf.drop(["uuid_x","identificacion","tipo_id","empleado_x","sexo","estado_civil","salario","bienestar","cargo","celular","direccion","Aprobado","fecha_ingreso","transporte","comunicacion","correo_corporativo",
+                           "nivel_de_riesgo","rol","tipo_de_contrato","uuid_y","Por_tra",
+                           "empleado_y","fecha","año_mes","fecha_observacion","tipo_observacion"],axis=1) 
+         dataf=dataf[['nombre_del_empleado','documento_de_identificacion',
+                         'fecha_ingreso_nomina','centro_de_costos','codigo_de_costo',
+                         'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
+                         'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']]
+         st.write(dataf[['nombre_del_empleado','documento_de_identificacion',
+                         'fecha_ingreso_nomina','centro_de_costos','codigo_de_costo',
+                         'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
+                         'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']])
          #data_selection[['nombre_del_empleado','documento_de_identificacion','centro_de_costos','dias_laborados','año_mes','tipo_de_novedad','Alerta']]    
-                
-         def to_excel(data_selection):
+            
+         def to_excel(dataf):
                     output = BytesIO()
                     writer = pd.ExcelWriter(output, engine='xlsxwriter')
-                    data_selection.to_excel(writer, index=False, sheet_name='Sheet1')
+                    dataf.to_excel(writer, index=False, sheet_name='Sheet1')
                     workbook = writer.book
                     worksheet = writer.sheets['Sheet1']
                     format1 = workbook.add_format({'num_format': '0.00'}) 
@@ -509,10 +522,15 @@ def main():
                     writer.save()
                     processed_data = output.getvalue()
                     return processed_data
-         Lab_xlsx = to_excel(data_selection)
+         Lab_xlsx = to_excel(dataf)
          st.download_button(label='Resultados en XLSX',
                                     data=Lab_xlsx ,
-                                    file_name= 'df_test.xlsx')   
+                                    file_name= 'df_test.xlsx')  
+         
+
+         st.download_button(label='Reporte Novedades',
+                               data=cargar.descargar(),
+                                  file_name= 'ReporteNovedades.xlsx')   
     #-----------------------------------------------------------------------------
          #agru=data.groupby(['nombre_del_empleado','tipo_de_novedad'],as_index=False)['dias_laborados'].sum()
          #st.write(agru)
@@ -963,7 +981,7 @@ def main():
            FE(Lab)
     
     
-    options=st.sidebar.selectbox('',options=['PREVEO','Nómina','Administrativa','Prestamos'])
+    options=st.sidebar.selectbox('',options=opt)
     
     
     

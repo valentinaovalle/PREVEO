@@ -14,6 +14,7 @@ if 'auth' not in st.session_state:
 	st.session_state['auth'] = None
 
 
+
 if st.session_state['auth']:
     style = """
     <style>
@@ -22,7 +23,8 @@ if st.session_state['auth']:
       </style>
     """
     st.markdown(style, unsafe_allow_html=True)
-    main()
+    opt=['PREVEO','Nómina','Administrativa','Prestamos'] if st.session_state['auth']=='prueba@lucro.com' else ['Nómina']
+    main(opt)
 
 else:
     cols_img = st.columns(12)

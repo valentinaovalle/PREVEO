@@ -602,8 +602,8 @@ def main(opt):
          data_selection = dataf.query("centro_de_costos == @vc")
          data_selection["Mes"] = (pd.to_datetime(data_selection['año_mes'], format='%Y.%m.%d', errors="coerce")
                    .dt.month_name(locale='es_ES.utf8'))
-        
-         st.write(data_selection)
+         
+         
          fig = make_subplots()
          fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
          colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(164,164,164)","rgb(224, 231, 104)","rgb(224, 231, 104)","rgb(147, 148, 132)","rgb(224, 231, 104)","rgb(224, 231, 104)"]

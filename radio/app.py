@@ -519,8 +519,13 @@ def main(opt):
          
          dataf[['nombre_del_empleado','documento_de_identificacion','centro_de_costos',
                 'dias_laborados','año_mes','tipo_de_novedad','Alerta']]
-         
-         dataf=dataf.drop(["uuid"],axis=1) 
+         st.subheader("Tabla Sugeridos")
+         dataf=dataf.drop(["uuid","fecha","fecha_observacion","fecha_ingreso_nomina",
+                           "empleado","tipo_observacion"],axis=1) 
+      
+         st.write(dataf)
+         #data_selection[['nombre_del_empleado','documento_de_identificacion','centro_de_costos','dias_laborados','año_mes','tipo_de_novedad','Alerta']]    
+         #st.write(dataf)
          #dataf=dataf[['nombre_del_empleado','documento_de_identificacion',
           #              'fecha_ingreso_nomina','centro_de_costos','codigo_de_costo',
            #             'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
@@ -531,10 +536,6 @@ def main(opt):
           #              'fecha_ingreso_nomina','centro_de_costos',
            #              'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
             #             'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']])
-         st.subheader("Tabla Sugeridos")
-         st.write(dataf)
-         #data_selection[['nombre_del_empleado','documento_de_identificacion','centro_de_costos','dias_laborados','año_mes','tipo_de_novedad','Alerta']]    
-         #st.write(dataf)
          def to_excel(df):
              output = BytesIO()
              writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -602,13 +603,14 @@ def main(opt):
          data_selection = dataf.query("centro_de_costos == @vc")
          data_selection["Mes"] = (pd.to_datetime(data_selection['año_mes'], format='%Y.%m.%d', errors="coerce")
                    .dt.month_name(locale='es_ES.utf8'))
-         
-         
+        
+         data_selection=data_selection.groupby(['Mes'],as_index=False)['tipo_de_novedad'].count()
          fig = make_subplots()
          fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
          colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(164,164,164)","rgb(224, 231, 104)","rgb(224, 231, 104)","rgb(147, 148, 132)","rgb(224, 231, 104)","rgb(224, 231, 104)"]
-         fig.add_trace(go.Bar(y=data_selection['tipo_de_novedad'].value_counts(),
-                              x=data_selection['Mes'],marker_color=colors))
+         fig.add_trace(go.Bar(x=data_selection['Mes'],
+                              y=data_selection['tipo_de_novedad'],
+                              marker_color=colors))
          fig.update_layout(title_text='Novedades',title_x=0.5,barmode='stack', yaxis={'categoryorder':'total ascending'})
          st.plotly_chart(fig,use_container_width=True)     
         

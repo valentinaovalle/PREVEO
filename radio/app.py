@@ -539,7 +539,8 @@ def main(opt):
          
          dataf=dataf.drop(["uuid","fecha","fecha_observacion","fecha_ingreso_nomina",
                            "empleado","tipo_observacion"],axis=1) 
-      
+         
+         dataf.index = np.arange(1, len(dataf) + 1)
          st.write(dataf)
          #data_selection[['nombre_del_empleado','documento_de_identificacion','centro_de_costos','dias_laborados','año_mes','tipo_de_novedad','Alerta']]    
          #st.write(dataf)
@@ -592,6 +593,7 @@ def main(opt):
          
          st.subheader("Reporte Novedades")
          excel=pd.read_excel('Reporte Novedades.xlsx')
+         excel.index = np.arange(1, len(excel) + 1)
          st.write(excel)
          excel2 = to_excel(excel)
          st.download_button(label='Reporte Novedades',

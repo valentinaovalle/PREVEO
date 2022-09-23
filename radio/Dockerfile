@@ -18,7 +18,7 @@ ENV TZ="America/Bogota"
 ENV PYTHONUNBUFFERED TRUE
 
 # Install dependencies.
-RUN pip install streamlit==1.12.2 streamlit-aggrid==0.3.3 pyxlsb==1.0.9 datatable==1.0.0
+RUN pip install streamlit==1.12.2 streamlit-aggrid==0.3.3 pyxlsb==1.0.9 datatable==1.0.0 openpyxl==3.0.10
 RUN pip install xlsxwriter==3.0.3 plotly==5.6.0 opencv-python==4.5.5.62 Markdown==3.4.1 
 
 # Copy local code to the container image.

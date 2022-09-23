@@ -28,7 +28,7 @@ if st.session_state['auth']:
 
 else:
     cols_img = st.columns(12)
-    cols_img[5].image("img/PREVEO4.PNG",width=200)
+    cols_img[5].image("img/PREVEO4.png",width=200)
     cols = st.columns((1,3,1))
     form = cols[1].form("login")
     c = form.empty()

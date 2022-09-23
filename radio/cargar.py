@@ -13,8 +13,10 @@ def download_file(url):
 
     return local_filename
 
-BASE_URL = st.secrets["API_PROD"] if st.secrets.get("PROD",False) else st.secrets["API_DEV"]
 
+print(st.secrets.get("PROD",False))
+BASE_URL = st.secrets["API_PROD"] if st.secrets.get("PROD",False) else st.secrets["API_DEV"]
+print(BASE_URL)
 
 def traer_toc():
     data = {

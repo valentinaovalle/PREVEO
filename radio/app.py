@@ -67,6 +67,15 @@ def main(opt):
     #Fac = data.groupby(['Nombre Del Empleado', 'Documento De Identificacion'])['Dias Laborados'].sum() 
     data['empleado']=data['nombre_del_empleado']+ "-" +data["documento_de_identificacion"]
     
+    data['Alerta']=""
+    for i in range(len(data['nombre_del_empleado'])):
+        if data.iloc[i,3] == 30:
+           data.iloc[i,4] = "OK"
+        else:
+           data.iloc[i,4] = "Revisar"
+    
+    
+    
     Lab =data.groupby(['nombre_del_empleado','documento_de_identificacion','año_mes'],as_index=False)['dias_laborados'].sum()
     Lab['Alerta']=""
     
@@ -138,6 +147,9 @@ def main(opt):
      image =Image.open('PREVEO5.png') 
      new_image = image.resize((200, 175))
      st.image(new_image, width=None, use_column_width=False)
+     
+     
+   
     #sidebar-> menú desplegable a un lado
     #selectbox-> menú desplegable centrado a lo largo
     #---------------------------------------------------------------------------
@@ -387,7 +399,7 @@ def main(opt):
             empleado=[empleado]
         
          data_selection=dataf[(dataf.nombre_del_empleado.isin(empleado)) & (dataf.año_mes==mes)]
-       
+      
         #data_selection = dataf.query("centro_de_costos== @cent_cost_filter and nombre_del_empleado == @empleado ")
         
         #Tipo2=pd.merge(data_selection,tip_nov,left_on='tipo_de_novedad',right_on='uuid')   
@@ -411,12 +423,22 @@ def main(opt):
              data_selection.loc[i,'Alerta'] = "OK"
           else:
              data_selection.loc[i,'Alerta'] = "Revisar"
-         data_selection['Aprobado']=""
-         for i in data_selection['nombre_del_empleado'].index:
-           if data_selection.loc[i,'dias_laborados'] == 0:
-              data_selection.loc[i,'Aprobado'] = "Sin Aprobar"
-           else:
-              data_selection.loc[i,'Aprobado'] = "Aprobados"                  
+        # data_selection['Aprobado']=""
+        # for i in data_selection['nombre_del_empleado'].index:
+        #   if data_selection.loc[i,'dias_laborados'] == 0:
+        #      data_selection.loc[i,'Aprobado'] = "Sin Aprobar"
+        #   else:
+        #      data_selection.loc[i,'Aprobado'] = "Aprobados"                  
+        
+        
+         #revisar=data['Alerta'].str.contains('Revisar').value_counts()[True]
+         #ok=data['Alerta'].str.contains('OK').value_counts()[True]
+        
+         #c1,c2=st.columns(2)
+         #c1.metric(label='REVISAR', value=revisar)
+         #c2.metric(label='OK', value=ok)
+
+
         #data_selection[['nombre_del_empleado','documento_de_identificacion','centro_de_costos','dias_laborados','año_mes','tipo_de_novedad','Alerta']]
         
         #------------------------------------------------------------------------
@@ -452,7 +474,7 @@ def main(opt):
         #fig.update_layout(title_text='Empleados Por Centro de Costos',title_x=0.5,barmode="stack",xaxis_title='Dias') 
         #plt.title("Mince Pie Consumption Study Results")
         #st.plotly_chart(fig,use_container_width=True)
-    #-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
          
          fig2 = make_subplots()
          fig2.update_layout(plot_bgcolor='rgba(0,0,0,0)')
@@ -489,27 +511,30 @@ def main(opt):
          #fig3.update_layout(title='Novedad Mensual Por Centro De Costos',title_x=0.5) 
          st.plotly_chart(fig3,use_container_width=True)
     #-----------------------------------------------------------------------------
-         taps=st.selectbox("Aprobado:",pd.unique(data_selection['Aprobado']))
-         dataf=data_selection[(data_selection.Aprobado == taps)]
+         #taps=st.selectbox("Aprobado:",pd.unique(data_selection['Aprobado']))
+         #dataf=data_selection[(data_selection.Aprobado == taps)]
          #taps=st.selectbox("Aprobado:",pd.unique(tipo['Aprobado']))
          
          #dataf=tipo[(tipo.Aprobado == taps)]
          
          dataf[['nombre_del_empleado','documento_de_identificacion','centro_de_costos',
                 'dias_laborados','año_mes','tipo_de_novedad','Alerta']]
-      
-         dataf=dataf.drop(["uuid_x","identificacion","tipo_id","empleado_x","sexo","estado_civil","salario","bienestar","cargo","celular","direccion","Aprobado","fecha_ingreso","transporte","comunicacion","correo_corporativo",
-                           "nivel_de_riesgo","rol","tipo_de_contrato","uuid_y","Por_tra",
-                           "empleado_y","fecha","año_mes","fecha_observacion","tipo_observacion"],axis=1) 
-         dataf=dataf[['nombre_del_empleado','documento_de_identificacion',
-                         'fecha_ingreso_nomina','centro_de_costos','codigo_de_costo',
-                         'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
-                         'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']]
-         st.write(dataf[['nombre_del_empleado','documento_de_identificacion',
-                         'fecha_ingreso_nomina','centro_de_costos','codigo_de_costo',
-                         'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
-                         'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']])
+         
+         dataf=dataf.drop(["uuid"],axis=1) 
+         #dataf=dataf[['nombre_del_empleado','documento_de_identificacion',
+          #              'fecha_ingreso_nomina','centro_de_costos','codigo_de_costo',
+           #             'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
+            #            'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']]
+         
+         #st.subheader("Tabla Sugeridos")
+         #st.write(dataf[['nombre_del_empleado','documento_de_identificacion',
+          #              'fecha_ingreso_nomina','centro_de_costos',
+           #              'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
+            #             'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']])
+         st.subheader("Tabla Sugeridos")
+         st.write(dataf)
          #data_selection[['nombre_del_empleado','documento_de_identificacion','centro_de_costos','dias_laborados','año_mes','tipo_de_novedad','Alerta']]    
+         #st.write(dataf)
          def to_excel(df):
              output = BytesIO()
              writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -546,6 +571,8 @@ def main(opt):
                                     data=Lab_xlsx ,
                                     file_name= 'df_test.xlsx')  
          
+         
+         st.subheader("Reporte Novedades")
          excel=pd.read_excel('Reporte Novedades.xlsx')
          st.write(excel)
          excel2 = to_excel(excel)
@@ -576,11 +603,13 @@ def main(opt):
          data_selection["Mes"] = (pd.to_datetime(data_selection['año_mes'], format='%Y.%m.%d', errors="coerce")
                    .dt.month_name(locale='es_ES.utf8'))
         
+         st.write(data_selection)
          fig = make_subplots()
          fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
          colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(164,164,164)","rgb(224, 231, 104)","rgb(224, 231, 104)","rgb(147, 148, 132)","rgb(224, 231, 104)","rgb(224, 231, 104)"]
-         fig.add_trace(go.Bar(y=data_selection['tipo_de_novedad'].value_counts(), x=data_selection['Mes'],marker_color=colors))
-         fig.update_layout(title_text='Centro De Costos Con Más Reembolsos Por Mes',title_x=0.5,barmode='stack', yaxis={'categoryorder':'total ascending'})
+         fig.add_trace(go.Bar(y=data_selection['tipo_de_novedad'].value_counts(),
+                              x=data_selection['Mes'],marker_color=colors))
+         fig.update_layout(title_text='Novedades',title_x=0.5,barmode='stack', yaxis={'categoryorder':'total ascending'})
          st.plotly_chart(fig,use_container_width=True)     
         
         st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)

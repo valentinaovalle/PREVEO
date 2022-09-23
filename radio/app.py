@@ -399,8 +399,44 @@ def main(opt):
             empleado=[empleado]
         
          data_selection=dataf[(dataf.nombre_del_empleado.isin(empleado)) & (dataf.año_mes==mes)]
-      
+        
         #data_selection = dataf.query("centro_de_costos== @cent_cost_filter and nombre_del_empleado == @empleado ")
+         fig2 = make_subplots()
+         fig2.update_layout(plot_bgcolor='rgba(0,0,0,0)')
+         colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(75, 177, 61, 1)","rgb(224, 231, 104)","rgb(124, 144, 132)","rgb(63, 140, 90, 1)"]
+         
+
+         for t,c in zip(data_selection.tipo_de_novedad.unique(),colors):
+            plot_df = data_selection[data_selection.tipo_de_novedad == t]
+            fig2.add_trace(go.Bar(name=t,
+                                  x=plot_df.nombre_del_empleado,
+                                  y=plot_df.dias_laborados,
+                                  text=plot_df.dias_laborados,
+                                  marker_color=c))
+                    
+         fig2.update_layout(title_text='Empleados Por Novedad',title_x=0.5,barmode="stack") 
+         st.plotly_chart(fig2,use_container_width=True)
+       
+#------------------------------------------------------------------------------------------------------        
+         colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(124, 144, 132)","rgb(224, 231, 104)"]
+         fig3 = px.pie(data_selection, values='dias_laborados', names='tipo_de_novedad', color_discrete_sequence=colors
+                       #title='Novedad Mensual Por Centro De Costos'
+                       )
+         #fig3.update_layout(title='Novedad Mensual Por Centro De Costos',title_x=0.5) 
+         st.plotly_chart(fig3,use_container_width=True)
+#------------------------------------------------------------------------------------------------------        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         #Tipo2=pd.merge(data_selection,tip_nov,left_on='tipo_de_novedad',right_on='uuid')   
         #data_selection['Tipo Novedad']=Tipo2['novedad'].values
@@ -476,10 +512,15 @@ def main(opt):
         #st.plotly_chart(fig,use_container_width=True)
 #-----------------------------------------------------------------------------
          
-         fig2 = make_subplots()
-         fig2.update_layout(plot_bgcolor='rgba(0,0,0,0)')
-         colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(75, 177, 61, 1)","rgb(224, 231, 104)","rgb(124, 144, 132)","rgb(63, 140, 90, 1)"]
+    #------------------------------------------------------------------------------    
+
+    #-----------------------------------------------------------------------------
+         #taps=st.selectbox("Aprobado:",pd.unique(data_selection['Aprobado']))
+         #dataf=data_selection[(data_selection.Aprobado == taps)]
+         #taps=st.selectbox("Aprobado:",pd.unique(tipo['Aprobado']))
          
+         #dataf=tipo[(tipo.Aprobado == taps)]
+         st.subheader("Tabla Sugeridos")
          tipo=data[(data.centro_de_costos.isin(cent_cost_filter)) & (data.año_mes==mes)]
          tipo['Alerta']=""
          for i in tipo['nombre_del_empleado'].index:
@@ -492,34 +533,10 @@ def main(opt):
                      pd.unique(tipo['Alerta'])
                      )
          dataf=tipo[(tipo.Alerta == tap)]
-         for t,c in zip(dataf.tipo_de_novedad.unique(),colors):
-            plot_df = dataf[dataf.tipo_de_novedad == t]
-            fig2.add_trace(go.Bar(name=t,
-                                  x=plot_df.nombre_del_empleado,
-                                  y=plot_df.dias_laborados,
-                                  text=plot_df.dias_laborados,
-                                  marker_color=c))
-                    
-         fig2.update_layout(title_text='Empleados Por Novedad',title_x=0.5,barmode="stack") 
-         st.plotly_chart(fig2,use_container_width=True)
-       
-    #------------------------------------------------------------------------------    
-         colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(124, 144, 132)","rgb(224, 231, 104)"]
-         fig3 = px.pie(tipo, values='dias_laborados', names='tipo_de_novedad', color_discrete_sequence=colors
-                       #title='Novedad Mensual Por Centro De Costos'
-                       )
-         #fig3.update_layout(title='Novedad Mensual Por Centro De Costos',title_x=0.5) 
-         st.plotly_chart(fig3,use_container_width=True)
-    #-----------------------------------------------------------------------------
-         #taps=st.selectbox("Aprobado:",pd.unique(data_selection['Aprobado']))
-         #dataf=data_selection[(data_selection.Aprobado == taps)]
-         #taps=st.selectbox("Aprobado:",pd.unique(tipo['Aprobado']))
-         
-         #dataf=tipo[(tipo.Aprobado == taps)]
-         
          dataf[['nombre_del_empleado','documento_de_identificacion','centro_de_costos',
                 'dias_laborados','año_mes','tipo_de_novedad','Alerta']]
-         st.subheader("Tabla Sugeridos")
+
+         
          dataf=dataf.drop(["uuid","fecha","fecha_observacion","fecha_ingreso_nomina",
                            "empleado","tipo_observacion"],axis=1) 
       

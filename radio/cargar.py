@@ -84,7 +84,8 @@ def cargar_info():
     trans_data = _normalize(response.text)
     dict_data = eval(trans_data)
     pr = pd.DataFrame(dict_data['data'])
-
+    
+    descargar()
     return cost_center, employees, data, tip_nov ,df, pr
 
 def descargar():

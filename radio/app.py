@@ -510,27 +510,48 @@ def main(opt):
                          'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
                          'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']])
          #data_selection[['nombre_del_empleado','documento_de_identificacion','centro_de_costos','dias_laborados','año_mes','tipo_de_novedad','Alerta']]    
-            
-         def to_excel(dataf):
-                    output = BytesIO()
-                    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-                    dataf.to_excel(writer, index=False, sheet_name='Sheet1')
-                    workbook = writer.book
-                    worksheet = writer.sheets['Sheet1']
-                    format1 = workbook.add_format({'num_format': '0.00'}) 
-                    worksheet.set_column('A:A', None, format1)  
-                    writer.save()
-                    processed_data = output.getvalue()
-                    return processed_data
+         def to_excel(df):
+             output = BytesIO()
+             writer = pd.ExcelWriter(output, engine='xlsxwriter')
+             df.to_excel(writer, index = False, sheet_name='Hoja1',encoding='utf-16')
+             #Indicate workbook and worksheet for formatting
+             workbook = writer.book
+             worksheet = writer.sheets['Hoja1']
+
+             #Iterate through each column and set the width == the max length in that column. A padding length of 2 is also added.
+             for i, col in enumerate(df.columns):
+        # find length of column i
+                 column_len = df[col].astype(str).str.len().max()
+                 # Setting the length if the column header is larger
+                 # than the max column value length
+                 column_len = max(column_len, len(col)) + 2
+                 # set the column length
+                 worksheet.set_column(i, i, column_len)
+             writer.save()
+             processed_data = output.getvalue()
+             return processed_data   
+         #def to_excel(dataf):
+          #          output = BytesIO()
+           #         writer = pd.ExcelWriter(output, engine='xlsxwriter')
+            #        dataf.to_excel(writer, index=False, sheet_name='Sheet1')
+             #       workbook = writer.book
+              #      worksheet = writer.sheets['Sheet1']
+               #     format1 = workbook.add_format({'num_format': '0.00'}) 
+                #    worksheet.set_column('A:A', None, format1)  
+                 #   writer.save()
+                  #  processed_data = output.getvalue()
+                   # return processed_data
          Lab_xlsx = to_excel(dataf)
          st.download_button(label='Resultados en XLSX',
                                     data=Lab_xlsx ,
                                     file_name= 'df_test.xlsx')  
          
-
+         excel=pd.read_excel('Reporte Novedades.xlsx')
+         st.write(excel)
+         excel2 = to_excel(excel)
          st.download_button(label='Reporte Novedades',
-                               data=cargar.descargar(),
-                                  file_name= 'ReporteNovedades.xlsx')   
+                               data=excel2,
+                               file_name= 'Reporte Novedades.xlsx')   
     #-----------------------------------------------------------------------------
          #agru=data.groupby(['nombre_del_empleado','tipo_de_novedad'],as_index=False)['dias_laborados'].sum()
          #st.write(agru)

@@ -14,9 +14,9 @@ def download_file(url):
     return local_filename
 
 
-print(st.secrets.get("PROD",False))
+
 BASE_URL = st.secrets["API_PROD"] if st.secrets.get("PROD",False) else st.secrets["API_DEV"]
-print(BASE_URL)
+
 
 def traer_toc():
     data = {
@@ -87,6 +87,9 @@ def cargar_info():
     dict_data = eval(trans_data)
     pr = pd.DataFrame(dict_data['data'])
     
+    
+    
+    
     descargar()
     return cost_center, employees, data, tip_nov ,df, pr
 
@@ -94,4 +97,36 @@ def descargar():
     url = f"{BASE_URL}/api/v1/spreadsheet"
     return download_file(url)
     
-   
+def cargar_excel(files):
+    token = traer_toc()
+    headers = {'Authorization': f'Bearer {token}'}
+    
+    response = requests.post(f"{BASE_URL}/api/v1/spreadsheet", headers=headers, files=files)
+    trans_data = _normalize(response.text)
+    dict_data = eval(trans_data)
+    return dict_data 
+
+@st.experimental_memo(ttl=300)
+def traer_cale():
+    token = traer_toc()
+    headers = {'Authorization': f'Bearer {token}'}
+    
+    response = requests.get(f"{BASE_URL}/api/v1/schedule", headers=headers)
+    trans_data = _normalize(response.text)
+    dict_data = eval(trans_data)
+    cale = pd.DataFrame(dict_data['data'])
+    return cale
+
+def mod_cale(ini,fin):
+    token = traer_toc()
+    headers = {'Authorization': f'Bearer {token}'}
+    
+    envia={
+    "format_code": "F-NOM-01",
+    "day_from": ini,
+    "day_to": fin
+    }
+    response = requests.post(f"{BASE_URL}/api/v1/active/1", headers=headers, json=envia)
+    trans_data = _normalize(response.text)
+    dict_data = eval(trans_data)
+    return dict_data 

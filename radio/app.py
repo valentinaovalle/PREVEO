@@ -1,13 +1,15 @@
 import streamlit as st
+from streamlit_metrics import metric, metric_row
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import datetime
 #import matplotlib
 #import matplotlib.pyplot as plt
+
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from io import BytesIO
+from io import BytesIO, StringIO
 from PIL import Image
 import os
 import cargar
@@ -22,7 +24,7 @@ def main(opt):
     
 
     cost_center, employees, data,tip_nov, df, pr =cargar.cargar_info()
-     
+    cale=cargar.traer_cale()
     with open('styles.css') as f:
         
         st.markdown(f"""<style>
@@ -367,10 +369,12 @@ def main(opt):
     def tab(Lab):
         st.header('')
         def edu(Lab):
-         st.header('NOVEDADES')
+         st.header('')
+        
          mes= st.sidebar.selectbox(
                      "Mes:",
-                     pd.unique(data['año_mes'])
+                     pd.unique(data['año_mes']),
+                     index=len(pd.unique(data['año_mes']))-1
                      )
          dataf=data[(data.año_mes == mes)]
          ms1=pd.unique(dataf['centro_de_costos'])
@@ -422,8 +426,9 @@ def main(opt):
          fig3 = px.pie(data_selection, values='dias_laborados', names='tipo_de_novedad', color_discrete_sequence=colors
                        #title='Novedad Mensual Por Centro De Costos'
                        )
-         #fig3.update_layout(title='Novedad Mensual Por Centro De Costos',title_x=0.5) 
          st.plotly_chart(fig3,use_container_width=True)
+         #fig3.update_layout(title='Novedad Mensual Por Centro De Costos',title_x=0.5) 
+         #st.plotly_chart(fig3,use_container_width=True)
 #------------------------------------------------------------------------------------------------------        
         
         
@@ -459,12 +464,13 @@ def main(opt):
              data_selection.loc[i,'Alerta'] = "OK"
           else:
              data_selection.loc[i,'Alerta'] = "Revisar"
-        # data_selection['Aprobado']=""
-        # for i in data_selection['nombre_del_empleado'].index:
-        #   if data_selection.loc[i,'dias_laborados'] == 0:
-        #      data_selection.loc[i,'Aprobado'] = "Sin Aprobar"
-        #   else:
-        #      data_selection.loc[i,'Aprobado'] = "Aprobados"                  
+        
+        #data_selection['Aprobado']=""
+        #for i in data_selection['nombre_del_empleado'].index:
+         #  if data_selection.loc[i,'dias_laborados'] == 0:
+           #   data_selection.loc[i,'Aprobado'] = "Sin Aprobar"
+          # else:
+            #  data_selection.loc[i,'Aprobado'] = "Aprobados"                  
         
         
          #revisar=data['Alerta'].str.contains('Revisar').value_counts()[True]
@@ -520,7 +526,7 @@ def main(opt):
          #taps=st.selectbox("Aprobado:",pd.unique(tipo['Aprobado']))
          
          #dataf=tipo[(tipo.Aprobado == taps)]
-         st.subheader("Tabla Sugeridos")
+         st.header("Tabla Sugeridos")
          tipo=data[(data.centro_de_costos.isin(cent_cost_filter)) & (data.año_mes==mes)]
          tipo['Alerta']=""
          for i in tipo['nombre_del_empleado'].index:
@@ -528,11 +534,19 @@ def main(opt):
              tipo.loc[i,'Alerta'] = "OK"
           else:
              tipo.loc[i,'Alerta'] = "Revisar"
+         
+         ms1=pd.unique(tipo['Alerta'])
+         ms2=np.append(ms1,"Todos")
          tap=st.selectbox(
                      "Alerta:",
-                     pd.unique(tipo['Alerta'])
+                     ms2,index=len(ms2)-1
                      )
-         dataf=tipo[(tipo.Alerta == tap)]
+        
+         if "Todos" in tap:
+             tap=tipo['Alerta']
+         else:
+             tap=[tap]
+         dataf=tipo[(tipo.Alerta.isin(tap))]
          dataf[['nombre_del_empleado','documento_de_identificacion','centro_de_costos',
                 'dias_laborados','año_mes','tipo_de_novedad','Alerta']]
 
@@ -590,40 +604,74 @@ def main(opt):
                                     data=Lab_xlsx ,
                                     file_name= 'df_test.xlsx')  
          
+        
+         st.header("Reporte Novedades")
          
-         st.subheader("Reporte Novedades")
+         
          excel=pd.read_excel('Reporte Novedades.xlsx')
          excel.index = np.arange(1, len(excel) + 1)
+         contandito=excel.iloc[:, 0].count()
+         
+         fig = go.Figure(go.Indicator(
+          mode = "number",
+          value = contandito,
+          title = {"text": "Novedades<br><span style='font-size:0.8em;color:gray'>"},
+          #domain = {'row': 0, 'column': 1}))
+          ))
+              
+
+         fig.update_layout(height=100,width=100,
+                         paper_bgcolor = "lightgray",margin = {'t':30, 'b':10, 'l':0,'r':0},
+        template = {'data' : {'indicator': [{'title': {'text': "Novedades"},
+        }]
+                         }})
+         st.plotly_chart(fig,use_container_width=True)  
+         
+         #st.metric('Novedades',value=contandito)
          st.write(excel)
          excel2 = to_excel(excel)
          st.download_button(label='Reporte Novedades',
-                               data=excel2,
-                               file_name= 'Reporte Novedades.xlsx')   
+                           data=excel2,
+                           file_name= 'Reporte Novedades.xlsx')  
+
+             
+         #st.subheader("Reporte Novedades")         contandito=excel.iloc[:, 0].count()
+         
     #-----------------------------------------------------------------------------
          #agru=data.groupby(['nombre_del_empleado','tipo_de_novedad'],as_index=False)['dias_laborados'].sum()
          #st.write(agru)
     #-----------------------------------------------------------------------------           
         def cal(Lab):
          st.header('HISTORICO')
-       
+         
+         ms1=pd.unique(data['centro_de_costos'])
+         ms2=np.append(ms1,"Todos")
          vc= st.sidebar.selectbox(
           "Centro de costos:",
-          pd.unique(data['centro_de_costos'])
+          ms2,index=len(ms2)-1
           )
+        
+         if "Todos" in vc:
+             vc=data['centro_de_costos']
+         else:
+             vc=[vc]
+         dataf=data[(data.centro_de_costos.isin(vc))]
+         
          dataf=data[(data.centro_de_costos == vc)]
          ms1=pd.unique(dataf['tipo_de_novedad'])
-                      
          nov= st.selectbox(
                      "Tipo De Novedad:",
                      ms1,
                      index=len(ms1)-1
                      )
          dataf=dataf[(dataf.tipo_de_novedad == nov)]
-         data_selection = dataf.query("centro_de_costos == @vc")
+         #data_selection = dataf.query("centro_de_costos == @vc")
+         data_selection=dataf[(dataf.centro_de_costos.isin(vc)) & (dataf.tipo_de_novedad==nov)]
          data_selection["Mes"] = (pd.to_datetime(data_selection['año_mes'], format='%Y.%m.%d', errors="coerce")
                    .dt.month_name(locale='es_ES.utf8'))
         
          data_selection=data_selection.groupby(['Mes'],as_index=False)['tipo_de_novedad'].count()
+         
          fig = make_subplots()
          fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
          colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(164,164,164)","rgb(224, 231, 104)","rgb(224, 231, 104)","rgb(147, 148, 132)","rgb(224, 231, 104)","rgb(224, 231, 104)"]
@@ -635,12 +683,46 @@ def main(opt):
         
         st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)
         #st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
-        subsub=st.sidebar.radio('',options=['Novedades','Historico'])
+        def admi(Lab):
+         st.header('')
+         uploaded_file = st.file_uploader("Choose a file")
+         if uploaded_file is not None:
+           
+             # To read file as bytes:
+           bytes_data = uploaded_file.getvalue()
+           #st.write(bytes_data)
+                    
+           files = {"file":(uploaded_file.name,bytes_data,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}      
+           respuesta=cargar.cargar_excel(files)
+         
+         with st.form("my_form"):
+             day_from=cale.loc[cale['format_code'] =='F-NOM-01',['day_from']]
+             day_to=cale.loc[cale['format_code'] =='F-NOM-01',['day_to']]
+             
+ 
+             today=datetime.datetime.now()
+             d = st.date_input(
+             "Inserta fecha",
+             value=(datetime.datetime(today.year, today.month, int(day_from.values[0])), datetime.datetime(today.year, today.month, int(day_to.values[0]))),
+             min_value=datetime.datetime(today.year, today.month, 1),
+             max_value=datetime.datetime(today.year, today.month, 30))
+             
+             submitted = st.form_submit_button("Guardar")
+             if submitted:
+              cargar.mod_cale(d[0].day, d[1].day)
+              cargar.traer_cale.clear()
+              st.success('Guardado', icon="✅")
+         
+         #files = {"file":bytes_data,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}
+        
+        subsub=st.sidebar.radio('',options=['Novedades','Historico','Administrador Novedades'])
+        
         if subsub == 'Novedades':
             edu(Lab)
         elif subsub == 'Historico':
             cal(Lab)
-        
+        elif subsub== 'Administrador Novedades':
+            admi(Lab)
     #------------------------------------------------------------------------------
         
         
@@ -953,12 +1035,31 @@ def main(opt):
                     CCCGP(Lab)
                 elif subfiltro == 'Historico':
                      FE(Lab)
+        
+        
+        
+        
+        
+        
+        
+        def con(Lab):
+            st.header('')
+                
+        def fac(Lab):
+            st.header((''))
+            
+        def cal(Lab):
+            st.header((''))
+        
         subsub=st.sidebar.radio('',options=['Reembolsos','F-AD-07 Caja Menor'])
         if subsub == 'Reembolsos':
             edu(Lab)
         elif subsub == 'F-AD-07 Caja Menor':
             cal(Lab)
-        
+        elif subsub == 'F-AD-31 Ingreso Contratistas':
+            con(Lab)    
+        elif subsub == 'F-AD-31 Revisión de Facturas Y/O CUENTAS DE COBRO':
+            fac(Lab)
         #st.write(vf2)    
         #dataf3=vf2[(vf2.index == centro)]
         #data_selection3=dataf3.query("cargar_a_centro_de_costos == @centro")

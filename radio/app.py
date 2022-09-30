@@ -23,7 +23,7 @@ import markdown
 def main(opt):
     
 
-    cost_center, employees, data,tip_nov, df, pr =cargar.cargar_info()
+    cost_center, employees, data,tip_nov, df, pr, cc_in =cargar.cargar_info()
     cale=cargar.traer_cale()
     with open('styles.css') as f:
         
@@ -41,22 +41,21 @@ def main(opt):
     pr['año_mes']=pd.to_datetime(pr['fecha'])
     cantpr=pr.groupby(['centro_de_costos','año_mes'],as_index=False)['valor_del_prestamo'].sum()
     contarpr=pr.groupby(['centro_de_costos'],as_index=False)['valor_del_prestamo'].count()
-    
-    
+
     #------------------------------------------------------------------------------
-    #df=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-AD-05/find_query.xlsx")
+    df=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-AD-05/find_query.xlsx")
     #df['valor_rembolso']=format(df['valor_rembolso'])
     reem=df.groupby(['nombres_y_apellidos','numero_cc','cargar_a_centro_de_costos'],as_index=False)['valor_rembolso'].sum()
     top=reem.head(5)
     vf=df['reembonsable_al_cliente'].value_counts()
     df['vf']=vf
     vf2=df.groupby(['cargar_a_centro_de_costos','reembonsable_al_cliente']).size().unstack(fill_value=0)
-    df['fecha_de_pago']=pd.to_datetime(df['fecha_de_pago'], errors='coerce')
-    df['año_mes']=df['fecha_de_pago'].dt.strftime('%Y-%m')
+    df['pagado.0.recibo_o_factura.fecha']=pd.to_datetime(df['pagado.0.recibo_o_factura.fecha'], errors='coerce')
+    df['año_mes']=df['pagado.0.recibo_o_factura.fecha'].dt.strftime('%Y-%m')
     cant=df.groupby(['cargar_a_centro_de_costos','año_mes'],as_index=False)['valor_rembolso'].sum()
     topcenter=cant.head(5)
     contar=df.groupby(['cargar_a_centro_de_costos'],as_index=False)['valor_rembolso'].count()
-    men=df.groupby(['fecha_de_pago'],as_index=False)['valor_rembolso'].sum
+    #men=df.groupby(['fecha_de_pago'],as_index=False)['valor_rembolso'].sum
     #-----------------------------------------------------------------------------
     #data = pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/LUCRO/prueba.xlsx")
     data=data.drop(["codigo_centro_de_costos"],axis=1) 
@@ -138,16 +137,32 @@ def main(opt):
     
     #-------------------------------------------------------------------------------
     
-    # get current working directory
-    #cwd = os.getcwd()
-    #get files in directory
-    #files = os.listdir(cwd) 
-    
-    #print(files)
-    
+#QUITAR ESPACIO DE EL BORDE SUPERIOR
+    reduce_header_height_style = """
+        <style>
+            div.block-container {padding-top:0rem;}
+        </style>
+    """
+    st.markdown(reduce_header_height_style, unsafe_allow_html=True)
+
+#CENTRAR EL LOGO EN LA BARRA LATERAL    
+    st.markdown(
+    """
+    <style>
+        [data-testid=stSidebar] [data-testid=stImage]{
+            text-align: center;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+        }
+    </style>
+    """, unsafe_allow_html=True
+    )
+#INSERTAR LOGO EN LA BARRA LATERAL    
     with st.sidebar.container():
      image =Image.open('PREVEO5.png') 
-     new_image = image.resize((200, 175))
+     new_image = image.resize((185, 160))
      st.image(new_image, width=None, use_column_width=False)
      
      
@@ -370,7 +385,8 @@ def main(opt):
         st.header('')
         def edu(Lab):
          st.header('')
-        
+         
+         
          mes= st.sidebar.selectbox(
                      "Mes:",
                      pd.unique(data['año_mes']),
@@ -403,7 +419,7 @@ def main(opt):
             empleado=[empleado]
         
          data_selection=dataf[(dataf.nombre_del_empleado.isin(empleado)) & (dataf.año_mes==mes)]
-        
+         st.header("Novedades")
         #data_selection = dataf.query("centro_de_costos== @cent_cost_filter and nombre_del_empleado == @empleado ")
          fig2 = make_subplots()
          fig2.update_layout(plot_bgcolor='rgba(0,0,0,0)')
@@ -553,11 +569,14 @@ def main(opt):
          
          dataf=dataf.drop(["uuid","fecha","fecha_observacion","fecha_ingreso_nomina",
                            "empleado","tipo_observacion"],axis=1) 
-         
          dataf.index = np.arange(1, len(dataf) + 1)
          st.write(dataf)
+
+         
+         
+         
          #data_selection[['nombre_del_empleado','documento_de_identificacion','centro_de_costos','dias_laborados','año_mes','tipo_de_novedad','Alerta']]    
-         #st.write(dataf)
+         
          #dataf=dataf[['nombre_del_empleado','documento_de_identificacion',
           #              'fecha_ingreso_nomina','centro_de_costos','codigo_de_costo',
            #             'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
@@ -604,7 +623,10 @@ def main(opt):
                                     data=Lab_xlsx ,
                                     file_name= 'df_test.xlsx')  
          
-        
+         
+         
+         
+         
          st.header("Reporte Novedades")
          
          
@@ -633,8 +655,26 @@ def main(opt):
          st.download_button(label='Reporte Novedades',
                            data=excel2,
                            file_name= 'Reporte Novedades.xlsx')  
-
-             
+        
+         a=list(dataf['centro_de_costos'].unique())
+         c=list(cost_center['centro_de_costo'].unique())
+         resta=list(set(c)-set(a))
+         
+         nulos=pd.DataFrame(resta,columns=['Centros De Costo'])
+         nulos.index = np.arange(1, len(nulos) + 1)
+         
+         
+         
+         st.header("Sin Reporte")
+         cc1,cc2=st.columns(2)
+         cc1.metric(label='CENTROS DE COSTOS', value=len(resta))
+         cc2.metric(label='EMPLEADOS', value='EN ESPERA')
+         
+         tab1, tab2 = st.tabs(["Centros", "Empleados"])
+         with tab1:
+             st.write(nulos)
+         with tab2:
+             st.write(3)
          #st.subheader("Reporte Novedades")         contandito=excel.iloc[:, 0].count()
          
     #-----------------------------------------------------------------------------

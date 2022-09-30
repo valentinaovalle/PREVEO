@@ -87,11 +87,14 @@ def cargar_info():
     dict_data = eval(trans_data)
     pr = pd.DataFrame(dict_data['data'])
     
-    
+    response = requests.get(f"{BASE_URL}/api/v1/cost_center_inactive", headers=headers)
+    trans_data = _normalize(response.text)
+    dict_data = eval(trans_data)
+    cc_in = pd.DataFrame(dict_data['data'])
     
     
     descargar()
-    return cost_center, employees, data, tip_nov ,df, pr
+    return cost_center, employees, data, tip_nov ,df, pr, cc_in
 
 def descargar():
     url = f"{BASE_URL}/api/v1/spreadsheet"

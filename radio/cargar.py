@@ -8,6 +8,7 @@ import shutil
 def download_file(url):
     local_filename = 'Reporte Novedades.xlsx'
     with requests.get(url, stream=True) as r:
+        print(r)
         with open(local_filename, 'wb') as f:
             shutil.copyfileobj(r.raw, f)
 

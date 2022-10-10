@@ -440,8 +440,9 @@ def main(opt):
 #------------------------------------------------------------------------------------------------------        
          colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(124, 144, 132)","rgb(224, 231, 104)"]
          fig3 = px.pie(data_selection, values='dias_laborados', names='tipo_de_novedad', color_discrete_sequence=colors
-                       #title='Novedad Mensual Por Centro De Costos'
+                       ,#title='Novedad Mensual Por Centro De Costos'
                        )
+         fig3.update_layout(legend=dict(orientation="h"))
          st.plotly_chart(fig3,use_container_width=True)
          #fig3.update_layout(title='Novedad Mensual Por Centro De Costos',title_x=0.5) 
          #st.plotly_chart(fig3,use_container_width=True)
@@ -630,8 +631,10 @@ def main(opt):
          st.header("Reporte Novedades")
          
          
-         excel=pd.read_excel('Reporte Novedades.xlsx')
+         excel=pd.read_excel('Reporte Novedades.xlsx',engine="openpyxl")
+         
          excel.index = np.arange(1, len(excel) + 1)
+
          contandito=excel.iloc[:, 0].count()
          
          fig = go.Figure(go.Indicator(
@@ -658,23 +661,28 @@ def main(opt):
         
          a=list(dataf['centro_de_costos'].unique())
          c=list(cost_center['centro_de_costo'].unique())
-         resta=list(set(c)-set(a))
+         cen_sin=list(set(c)-set(a))
          
-         nulos=pd.DataFrame(resta,columns=['Centros De Costo'])
-         nulos.index = np.arange(1, len(nulos) + 1)
-         
+         cc_nulos=pd.DataFrame(cen_sin,columns=['Centros De Costo'])
+         cc_nulos.index = np.arange(1, len(cc_nulos) + 1)
+        
+         d=list(dataf['nombre_del_empleado'].unique())
+         e=list(employees['empleado'].unique())
+         em_sin=list(set(e)-set(d))
+         em_nulos=pd.DataFrame(em_sin,columns=['Empleados'])
+         em_nulos.index = np.arange(1, len(em_nulos) + 1)
          
          
          st.header("Sin Reporte")
          cc1,cc2=st.columns(2)
-         cc1.metric(label='CENTROS DE COSTOS', value=len(resta))
-         cc2.metric(label='EMPLEADOS', value='EN ESPERA')
+         cc1.metric(label='CENTROS DE COSTOS', value=len(cen_sin))
+         cc2.metric(label='EMPLEADOS', value=len(em_sin))
          
          tab1, tab2 = st.tabs(["Centros", "Empleados"])
          with tab1:
-             st.write(nulos)
+             st.write(cc_nulos)
          with tab2:
-             st.write(3)
+             st.write(em_nulos)
          #st.subheader("Reporte Novedades")         contandito=excel.iloc[:, 0].count()
          
     #-----------------------------------------------------------------------------
@@ -724,8 +732,8 @@ def main(opt):
         st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)
         #st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
         def admi(Lab):
-         st.header('')
-         uploaded_file = st.file_uploader("Choose a file")
+         st.subheader('Subir Excel Actualizado')
+         uploaded_file = st.file_uploader("")
          if uploaded_file is not None:
            
              # To read file as bytes:

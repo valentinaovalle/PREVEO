@@ -43,7 +43,11 @@ def main(opt):
     contarpr=pr.groupby(['centro_de_costos'],as_index=False)['valor_del_prestamo'].count()
 
     #------------------------------------------------------------------------------
-    df=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-AD-05/find_query.xlsx")
+    url2='https://drive.google.com/file/d/1-21f9kCJfkcDce91hJYo3e_7030aKoII/view?usp=sharing'
+    url2='https://drive.google.com/uc?id=' + url2.split('/')[-2]
+    df = pd.read_csv(url2,sep=';')
+
+    #df=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-AD-05/find_query.xlsx")
     #df['valor_rembolso']=format(df['valor_rembolso'])
     reem=df.groupby(['nombres_y_apellidos','numero_cc','cargar_a_centro_de_costos'],as_index=False)['valor_rembolso'].sum()
     top=reem.head(5)
@@ -419,7 +423,7 @@ def main(opt):
             empleado=[empleado]
         
          data_selection=dataf[(dataf.nombre_del_empleado.isin(empleado)) & (dataf.año_mes==mes)]
-         st.header("Novedades")
+         st.subheader("Novedades")
         #data_selection = dataf.query("centro_de_costos== @cent_cost_filter and nombre_del_empleado == @empleado ")
          fig2 = make_subplots()
          fig2.update_layout(plot_bgcolor='rgba(0,0,0,0)')

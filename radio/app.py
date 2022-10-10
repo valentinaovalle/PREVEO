@@ -629,36 +629,37 @@ def main(opt):
          
          
          st.header("Reporte Novedades")
+         try:
          
-         
-         excel=pd.read_excel('Reporte Novedades.xlsx',engine="openpyxl")
-         
-         excel.index = np.arange(1, len(excel) + 1)
-
-         contandito=excel.iloc[:, 0].count()
-         
-         fig = go.Figure(go.Indicator(
-          mode = "number",
-          value = contandito,
-          title = {"text": "Novedades<br><span style='font-size:0.8em;color:gray'>"},
-          #domain = {'row': 0, 'column': 1}))
-          ))
-              
-
-         fig.update_layout(height=100,width=100,
-                         paper_bgcolor = "lightgray",margin = {'t':30, 'b':10, 'l':0,'r':0},
-        template = {'data' : {'indicator': [{'title': {'text': "Novedades"},
-        }]
-                         }})
-         st.plotly_chart(fig,use_container_width=True)  
-         
-         #st.metric('Novedades',value=contandito)
-         st.write(excel)
-         excel2 = to_excel(excel)
-         st.download_button(label='Reporte Novedades',
-                           data=excel2,
-                           file_name= 'Reporte Novedades.xlsx')  
-        
+             excel=pd.read_excel('Reporte Novedades.xlsx',engine="openpyxl")
+             
+             excel.index = np.arange(1, len(excel) + 1)
+    
+             contandito=excel.iloc[:, 0].count()
+             
+             fig = go.Figure(go.Indicator(
+              mode = "number",
+              value = contandito,
+              title = {"text": "Novedades<br><span style='font-size:0.8em;color:gray'>"},
+              #domain = {'row': 0, 'column': 1}))
+              ))
+                  
+    
+             fig.update_layout(height=100,width=100,
+                             paper_bgcolor = "lightgray",margin = {'t':30, 'b':10, 'l':0,'r':0},
+            template = {'data' : {'indicator': [{'title': {'text': "Novedades"},
+            }]
+                             }})
+             st.plotly_chart(fig,use_container_width=True)  
+             
+             #st.metric('Novedades',value=contandito)
+             st.write(excel)
+             excel2 = to_excel(excel)
+             st.download_button(label='Reporte Novedades',
+                               data=excel2,
+                               file_name= 'Reporte Novedades.xlsx')  
+         except:
+             st.info('No hay reporte de novedades para este mes')
          a=list(dataf['centro_de_costos'].unique())
          c=list(cost_center['centro_de_costo'].unique())
          cen_sin=list(set(c)-set(a))

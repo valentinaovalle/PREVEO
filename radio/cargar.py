@@ -58,48 +58,65 @@ def cargar_info():
     token = traer_toc()
     headers = {'Authorization': f'Bearer {token}'}
 
-    response = requests.get(f"{BASE_URL}/api/v1/employee", headers=headers)
-    trans_data = _normalize(response.text)
-    dict_data = eval(trans_data)
-    employees = pd.DataFrame(dict_data['data'])
-
-    response = requests.get(f"{BASE_URL}/api/v1/cost_center", headers=headers)
-    trans_data = _normalize(response.text)
-    dict_data = eval(trans_data)
-    cost_center = pd.DataFrame(dict_data['data'])
-    
-    response = requests.get(f"{BASE_URL}/api/v1/novelty_type", headers=headers)
-    trans_data = _normalize(response.text)
-    dict_data = eval(trans_data)
-    tip_nov = pd.DataFrame(dict_data['data'])
-    
-    response = requests.get(f"{BASE_URL}/api/v1/novelty", headers=headers)
-    trans_data = _normalize(response.text)
-    dict_data = eval(trans_data)
-    data = pd.DataFrame(dict_data['data'])
-    
-    response = requests.get(f"{BASE_URL}/api/v1/expense_reimbursement", headers=headers)
-    trans_data = _normalize(response.text)
-    dict_data = eval(trans_data)
-    df = pd.DataFrame(dict_data['data'])
-    
-    response = requests.get(f"{BASE_URL}/api/v1/loan", headers=headers)
-    trans_data = _normalize(response.text)
-    dict_data = eval(trans_data)
-    pr = pd.DataFrame(dict_data['data'])
-    
-    response = requests.get(f"{BASE_URL}/api/v1/cost_center_inactive", headers=headers)
-    trans_data = _normalize(response.text)
-    dict_data = eval(trans_data)
-    cc_in = pd.DataFrame(dict_data['data'])
-    
+    try:
+        response = requests.get(f"{BASE_URL}/api/v1/employee", headers=headers)
+        trans_data = _normalize(response.text)
+        dict_data = eval(trans_data)
+        employees = pd.DataFrame(dict_data['data'])
+    except:
+        employees = pd.DataFrame()    
+    try:
+        response = requests.get(f"{BASE_URL}/api/v1/cost_center", headers=headers)
+        trans_data = _normalize(response.text)
+        dict_data = eval(trans_data)
+        cost_center = pd.DataFrame(dict_data['data'])
+    except:
+        cost_center = pd.DataFrame()
+    try:        
+        response = requests.get(f"{BASE_URL}/api/v1/novelty_type", headers=headers)
+        trans_data = _normalize(response.text)
+        dict_data = eval(trans_data)
+        tip_nov = pd.DataFrame(dict_data['data'])
+    except:
+        tip_nov = pd.DataFrame()
+    try:        
+        response = requests.get(f"{BASE_URL}/api/v1/novelty", headers=headers)
+        trans_data = _normalize(response.text)
+        dict_data = eval(trans_data)
+        data = pd.DataFrame(dict_data['data'])
+    except:
+        data = pd.DataFrame()
+    try:         
+        response = requests.get(f"{BASE_URL}/api/v1/expense_reimbursement", headers=headers)
+        trans_data = _normalize(response.text)
+        dict_data = eval(trans_data)
+        df = pd.DataFrame(dict_data['data'])
+    except:
+        df = pd.DataFrame()
+    try:    
+        response = requests.get(f"{BASE_URL}/api/v1/loan", headers=headers)
+        trans_data = _normalize(response.text)
+        dict_data = eval(trans_data)
+        pr = pd.DataFrame(dict_data['data'])
+    except: 
+        pr = pd.DataFrame()
+    try:    
+        response = requests.get(f"{BASE_URL}/api/v1/cost_center_inactive", headers=headers)
+        trans_data = _normalize(response.text)
+        dict_data = eval(trans_data)
+        cc_in = pd.DataFrame(dict_data['data'])
+    except:
+        cc_in = pd.DataFrame()
     
     descargar()
     return cost_center, employees, data, tip_nov ,df, pr, cc_in
 
 def descargar():
-    url = f"{BASE_URL}/api/v1/spreadsheet"
-    return download_file(url)
+    try:
+        url = f"{BASE_URL}/api/v1/spreadsheet"
+        return download_file(url)
+    except:
+        pass
     
 def cargar_excel(files):
     token = traer_toc()

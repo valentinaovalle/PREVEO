@@ -439,6 +439,8 @@ def main(opt):
                                   marker_color=c))
                     
          fig2.update_layout(title_text='Empleados Por Novedad',title_x=0.5,barmode="stack") 
+         fig2.update_yaxes(
+             title_text = "Dias Laborados")
          st.plotly_chart(fig2,use_container_width=True)
        
 #------------------------------------------------------------------------------------------------------        

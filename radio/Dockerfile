@@ -7,6 +7,17 @@ RUN pip install --upgrade pip
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
+
+RUN apt-get update \
+    && apt-get -y install libpq-dev gcc locales locales-all pkg-config
+
+RUN sed -i -e 's/# es_ES.UTF-8 UTF-8/es_ES.UTF-8 UTF-8/' /etc/locale.gen \
+ && locale-gen
+
+ENV LC_ALL es_ES.UTF-8 
+ENV LANG es_ES.UTF-8  
+ENV LANGUAGE es_ES:es 
+
 # Service must listen to $PORT environment variable.
 # This default value facilitates local development.
 ENV PORT 8050

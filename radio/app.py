@@ -732,6 +732,11 @@ def main(opt):
                               y=data_selection['tipo_de_novedad'],
                               marker_color=colors))
          fig.update_layout(title_text='Novedades',title_x=0.5,barmode='stack', yaxis={'categoryorder':'total ascending'})
+         fig.update_xaxes(
+             title_text = "Mes")
+         fig.update_yaxes(
+             title_text = "Cantidad de Empleados")
+         
          st.plotly_chart(fig,use_container_width=True)     
         
         st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)

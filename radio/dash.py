@@ -39,7 +39,7 @@ else:
     # Every form must have a submit button.
     submitted = form.form_submit_button("Entrar")
     if submitted:
-        if username in ['prueba@lucro.com','rquevedo@premiumbpo.com','nomina@preveo.com.co'] and password=='Preveo123*':
+        if username in ['prueba@lucro.com','rquevedo@premiumbpo.com','nomina@preveo.com.co','constanza.mora@preveo.com.co'] and password=='Preveo123*':
             st.session_state['auth'] = username
             cargar_info.clear()
             st.experimental_rerun()

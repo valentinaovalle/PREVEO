@@ -23,7 +23,7 @@ import markdown
 def main(opt):
     
 
-    cost_center, employees, data,tip_nov, df, pr, cc_in =cargar.cargar_info()
+    cost_center, employees, data, tip_nov ,df, pr, cc_in =cargar.cargar_info()
     cale=cargar.traer_cale()
     with open('styles.css') as f:
         
@@ -33,7 +33,7 @@ def main(opt):
         , unsafe_allow_html=True)
     
     
-    #scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/sprea...,"https://www.googleapis.com/auth/drive...","https://www.googleapis.com/auth/drive"]
+    #scope = ["https://spreadsheets.gptgle.com/feeds",'https://www.googleapis.com/auth/sprea...,"https://www.googleapis.com/auth/drive...","https://www.googleapis.com/auth/drive"]
     #creds = ServiceAccountCredentials.from_json_keyfile_name("tuarchivo.json", scope)
     #client=gspread.authorize(creds)
     #pr=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-NOM-02/find_query.xlsx")
@@ -45,20 +45,33 @@ def main(opt):
     #------------------------------------------------------------------------------
     url2='https://drive.google.com/file/d/1-21f9kCJfkcDce91hJYo3e_7030aKoII/view?usp=sharing'
     url2='https://drive.google.com/uc?id=' + url2.split('/')[-2]
-    df = pd.read_csv(url2,sep=';')
-
+    dff2 = pd.read_csv(url2,sep=';')
+    df=df.drop(['codigo'], axis=1)
     #df=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-AD-05/find_query.xlsx")
     #df['valor_rembolso']=format(df['valor_rembolso'])
-    reem=df.groupby(['nombres_y_apellidos','numero_cc','cargar_a_centro_de_costos'],as_index=False)['valor_rembolso'].sum()
+    df=df.explode('centro_costo')
+    df=df.explode('pagado')
+    #df=pd.concat([df.drop(['centro_costo'], axis=1), df['centro_costo'].apply(pd.Series)], axis=1)
+    df=df.drop(['historico_de_aprobacion'], axis=1)
+    df=pd.concat([df.drop(['centro_costo'], axis=1), df['centro_costo'].apply(pd.Series)], axis=1)
+    df=pd.concat([df.drop(['pagado'], axis=1), df['pagado'].apply(pd.Series)], axis=1)
+    df=df.drop(['monto_aprobado_para_rembolso'], axis=1)
+    df=df.drop(['valor_total'], axis=1)
+    df=pd.concat([df.drop(['recibo_o_factura'], axis=1), df['recibo_o_factura'].apply(pd.Series)], axis=1)
+   
+    
+    reem=df.groupby(['nombres_y_apellidos','numero_cc','nombre'],as_index=False)['valor_rembolso'].sum()
     top=reem.head(5)
     vf=df['reembonsable_al_cliente'].value_counts()
     df['vf']=vf
-    vf2=df.groupby(['cargar_a_centro_de_costos','reembonsable_al_cliente']).size().unstack(fill_value=0)
-    df['pagado.0.recibo_o_factura.fecha']=pd.to_datetime(df['pagado.0.recibo_o_factura.fecha'], errors='coerce')
-    df['año_mes']=df['pagado.0.recibo_o_factura.fecha'].dt.strftime('%Y-%m')
-    cant=df.groupby(['cargar_a_centro_de_costos','año_mes'],as_index=False)['valor_rembolso'].sum()
+    
+    vf2=df.groupby(['nombre','reembonsable_al_cliente']).size().unstack(fill_value=0)
+    df['fecha']=pd.to_datetime(df['fecha'], errors='coerce')
+    df['año_mes']=df['fecha'].dt.strftime('%Y-%m')
+    
+    cant=df.groupby(['nombre','año_mes'],as_index=False)['valor_rembolso'].sum()
     topcenter=cant.head(5)
-    contar=df.groupby(['cargar_a_centro_de_costos'],as_index=False)['valor_rembolso'].count()
+    contar=df.groupby(['nombre'],as_index=False)['valor_rembolso'].count()
     #men=df.groupby(['fecha_de_pago'],as_index=False)['valor_rembolso'].sum
     #-----------------------------------------------------------------------------
     #data = pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/LUCRO/prueba.xlsx")
@@ -250,12 +263,13 @@ def main(opt):
     #-----------------------------------------------------------------------------
     #-------------------------------PREVEO----------------------------------------
     #------------------------------------------------------------------------------
+    #st.write(data)
     def preveo():
         st.header('')
         
         def cc():
             st.header('CENTROS DE COSTOS')
-            cost_center, employees, data,tip_nov, df, pr =cargar.cargar_info()
+            cost_center, employees, data, tip_nov ,df, pr, cc_in =cargar.cargar_info()
             url='https://drive.google.com/file/d/1PLqE00MJbjR_P9f64-AAd1NeFw0gPFIr/view?usp=sharing'
             url='https://drive.google.com/uc?id=' + url.split('/')[-2]
             cost_center = pd.read_csv(url,sep=';')
@@ -365,11 +379,48 @@ def main(opt):
             maxi=employees['salario'].astype(int).max()
             mini=employees['salario'].astype(int).min()
             #nb_deputies = employees['salario']
+            st.write(sorteo) 
             nb_mbrs = st.select_slider("salario",sorteo['salario'],value=(mini,maxi))
-            mask_mbrs = employees['salario'].between(nb_mbrs[0], nb_mbrs[1]).to_frame()
-            df_dep_filtered =employees[mask_mbrs]
-            st.write(df_dep_filtered)
-            st.write(employees)
+            #st.write((sorteo['salario']<= ) & (sorteo['salario'].min()))
+            mask_mbrs =sorteo[(sorteo['salario'] <= nb_mbrs[1]) & (sorteo['salario'] >= nb_mbrs[0])]
+            
+            #mask_mbrs = sorteo.between(nb_mbrs[0], nb_mbrs[1]).to_frame()
+            st.write(mask_mbrs)
+            def to_excel(df):
+             output = BytesIO()
+             writer = pd.ExcelWriter(output, engine='xlsxwriter')
+             df.to_excel(writer, index = False, sheet_name='Hoja1',encoding='utf-16')
+             #Indicate workbook and worksheet for formatting
+             workbook = writer.book
+             worksheet = writer.sheets['Hoja1']
+
+             #Iterate through each column and set the width == the max length in that column. A padding length of 2 is also added.
+             for i, col in enumerate(df.columns):
+        # find length of column i
+                 column_len = df[col].astype(str).str.len().max()
+                 # Setting the length if the column header is larger
+                 # than the max column value length
+                 column_len = max(column_len, len(col)) + 2
+                 # set the column length
+                 worksheet.set_column(i, i, column_len)
+             writer.save()
+             processed_data = output.getvalue()
+             return processed_data   
+         #def to_excel(dataf):
+          #          output = BytesIO()
+           #         writer = pd.ExcelWriter(output, engine='xlsxwriter')
+            #        dataf.to_excel(writer, index=False, sheet_name='Sheet1')
+             #       workbook = writer.book
+              #      worksheet = writer.sheets['Sheet1']
+               #     format1 = workbook.add_format({'num_format': '0.00'}) 
+                #    worksheet.set_column('A:A', None, format1)  
+                 #   writer.save()
+                  #  processed_data = output.getvalue()
+                   # return processed_data
+            Lab_xlsx = to_excel(mask_mbrs)
+            st.download_button(label='Resultados en XLSX',
+                                    data=Lab_xlsx ,
+                                    file_name= 'df_test.xlsx')             
             
        
         filpre=st.sidebar.selectbox('',options=['Centros de Costos','Empleados'])
@@ -577,6 +628,17 @@ def main(opt):
          dataf=dataf.drop(["uuid","fecha","fecha_observacion","fecha_ingreso_nomina",
                            "empleado","tipo_observacion"],axis=1) 
          dataf.index = np.arange(1, len(dataf) + 1)
+         
+         dataf['fecha_final_novedad'] = pd.to_datetime(dataf['fecha_final_novedad']) 
+         dataf['fecha_final_novedad']=dataf['fecha_final_novedad'].dt.strftime('%Y-%m-%d')
+         dataf['fecha_final_novedad'] = pd.to_datetime(dataf['fecha_final_novedad']) 
+         dataf['fecha_final_novedad']=dataf['fecha_final_novedad'].dt.strftime('%Y-%m-%d')
+         dataf.rename(columns={'quien_reporta_la_novedad':'Quien reporta la novedad',
+                        'nombre_del_empleado':'Nombre del Empleado','documento_de_identificacion':'Documento de Identificacion','centro_de_costos':'Centro de Costos',
+                        'tipo_de_novedad':'Tipo de Novedad','año_mes':'Año-Mes','dias_a_facturar':'Dias a Facturar',
+                        'dias_laborados':'Dias Laborados','fecha_inicial_novedad':'Fecha Inicial Novedad',
+                        'fecha_final_novedad':'Fecha Final Novedad'},
+               inplace=True)
          st.write(dataf)
 
          
@@ -666,14 +728,14 @@ def main(opt):
                                file_name= 'Reporte Novedades.xlsx')  
          except:
              st.info('No hay reporte de novedades para este mes')
-         a=list(dataf['centro_de_costos'].unique())
+         a=list(dataf['Centro de Costos'].unique())
          c=list(cost_center['centro_de_costo'].unique())
          cen_sin=list(set(c)-set(a))
          
          cc_nulos=pd.DataFrame(cen_sin,columns=['Centros De Costo'])
          cc_nulos.index = np.arange(1, len(cc_nulos) + 1)
         
-         d=list(dataf['nombre_del_empleado'].unique())
+         d=list(dataf['Nombre del Empleado'].unique())
          e=list(employees['empleado'].unique())
          em_sin=list(set(e)-set(d))
          em_nulos=pd.DataFrame(em_sin,columns=['Empleados'])
@@ -697,6 +759,7 @@ def main(opt):
          #st.write(agru)
     #-----------------------------------------------------------------------------           
         def cal(Lab):
+            
          st.header('HISTORICO')
          
          ms1=pd.unique(data['centro_de_costos'])
@@ -820,7 +883,7 @@ def main(opt):
                     pd.unique(df['año_mes'])
                     )
                 dff=df[(df.año_mes == dfmes)]
-                ms1=pd.unique(dff['cargar_a_centro_de_costos'])
+                ms1=pd.unique(dff['nombre'])
                 ms2=np.append(ms1,"Todos")
     
                 df_filter= st.sidebar.selectbox(
@@ -831,7 +894,7 @@ def main(opt):
                     df_filter = dff['cargar_a_centro_de_costos']
                 else:
                     df_filter=[df_filter]
-                dff=dff[(dff.cargar_a_centro_de_costos.isin(df_filter))]
+                dff=dff[(dff.nombre.isin(df_filter))]
                 cd1=pd.unique(dff['nombres_y_apellidos'])
                 cd2=np.append(cd1,"Todos")
                 dfempleado = st.sidebar.selectbox(
@@ -846,7 +909,7 @@ def main(opt):
                 data_selection=dff[(dff.nombres_y_apellidos.isin(dfempleado)) & (dff.año_mes==dfmes)]
         #data_selection = dataf.query("centro_de_costos== @cent_cost_filter and nombre_del_empleado == @empleado ")
                 
-                st.write(data_selection[['nombres_y_apellidos','numero_cc','cargar_a_centro_de_costos','valor_rembolso','año_mes']])
+                st.write(data_selection[['nombres_y_apellidos','numero_cc','nombre','valor_rembolso','año_mes']])
                 def to_excel(df_selection):
                     output = BytesIO()
                     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -868,10 +931,10 @@ def main(opt):
             
                 centroc= st.sidebar.selectbox(
                     "Centro de costos:",
-                    pd.unique(reem['cargar_a_centro_de_costos'])
+                    pd.unique(reem['nombre'])
                     )
-                dataf3=reem[(reem.cargar_a_centro_de_costos == centroc)]
-                data_selection3=dataf3.query("cargar_a_centro_de_costos== @centroc")    
+                dataf3=reem[(reem.nombre == centroc)]
+                data_selection3=dataf3.query("nombre== @centroc")    
         
                 fig = make_subplots()
                 fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
@@ -890,7 +953,7 @@ def main(opt):
                 fig = make_subplots()
                 fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
                 colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(164,164,164)","rgb(224, 231, 104)","rgb(224, 231, 104)","rgb(147, 148, 132)","rgb(224, 231, 104)","rgb(224, 231, 104)"]
-                fig.add_trace(go.Bar(y=data_selection4['valor_rembolso'], x=data_selection4['cargar_a_centro_de_costos'],marker_color=colors))
+                fig.add_trace(go.Bar(y=data_selection4['valor_rembolso'], x=data_selection4['nombre'],marker_color=colors))
                 fig.update_layout(title_text='Centro De Costos Con Más Reembolsos Por Mes',title_x=0.5,barmode='stack', yaxis={'categoryorder':'total ascending'})
                 st.plotly_chart(fig,use_container_width=True)
                 
@@ -902,12 +965,12 @@ def main(opt):
             
                 centro= st.sidebar.selectbox(
                     "Centro de costos:",
-                    pd.unique(cant['cargar_a_centro_de_costos'])
+                    pd.unique(cant['nombre'])
                     )
-                dataf=cant[(cant.cargar_a_centro_de_costos == centro)]
-                dataf2=contar[(contar.cargar_a_centro_de_costos == centro)]
-                data_selection = dataf.query("cargar_a_centro_de_costos == @centro")
-                data_selection2 = dataf2.query("cargar_a_centro_de_costos == @centro")
+                dataf=cant[(cant.nombre == centro)]
+                dataf2=contar[(contar.nombre == centro)]
+                data_selection = dataf.query("nombre == @centro")
+                data_selection2 = dataf2.query("nombre == @centro")
                 data_selection["Mes"] = (pd.to_datetime(data_selection['año_mes'], format='%Y.%m.%d', errors="coerce")
                    .dt.month_name(locale='es_ES.utf8'))
         
@@ -1190,7 +1253,7 @@ def main(opt):
             colors=["rgb(211,212,21)","rgba(112,110,111,255)","rgb(164,164,164)","rgb(224, 231, 104)","rgb(224, 231, 104)","rgb(147, 148, 132)","rgb(224, 231, 104)","rgb(224, 231, 104)"]
             fig.add_trace(go.Bar(y=datapr_selection['valor_del_prestamo'], 
                                  x=datapr_selection['Mes'],
-                                 marker_color=colors,
+                                 marker_color=clors,
                                  text=pr.groupby(['centro_de_costos','año_mes'])['valor_del_prestamo'].sum(),
                                  textposition='outside'))
             #fig.update_traces(texttemplate='{valor_del_prestamo:.2s}', textposition='outside')

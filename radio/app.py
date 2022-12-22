@@ -178,7 +178,7 @@ def main(opt):
     )
 #INSERTAR LOGO EN LA BARRA LATERAL    
     with st.sidebar.container():
-     image =Image.open('PREVEO.png') 
+     image =Image.open('PREVEO.PNG') 
      new_image = image.resize((185, 160))
      st.image(new_image, width=None, use_column_width=False)
      

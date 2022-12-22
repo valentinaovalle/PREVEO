@@ -46,7 +46,8 @@ def main(opt):
     url2='https://drive.google.com/file/d/1-21f9kCJfkcDce91hJYo3e_7030aKoII/view?usp=sharing'
     url2='https://drive.google.com/uc?id=' + url2.split('/')[-2]
     dff2 = pd.read_csv(url2,sep=';')
-    df=df.drop(['codigo'], axis=1)
+   
+    #df=df.drop(['codigo'], axis=1)
     #df=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-AD-05/find_query.xlsx")
     #df['valor_rembolso']=format(df['valor_rembolso'])
     df=df.explode('centro_costo')

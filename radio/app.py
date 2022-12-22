@@ -50,29 +50,29 @@ def main(opt):
     #df=df.drop(['codigo'], axis=1)
     #df=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-AD-05/find_query.xlsx")
     #df['valor_rembolso']=format(df['valor_rembolso'])
-    df=df.explode('centro_costo')
-    df=df.explode('pagado')
+    #df=df.explode('centro_costo')
+    #df=df.explode('pagado')
     #df=pd.concat([df.drop(['centro_costo'], axis=1), df['centro_costo'].apply(pd.Series)], axis=1)
-    df=df.drop(['historico_de_aprobacion'], axis=1)
-    df=pd.concat([df.drop(['centro_costo'], axis=1), df['centro_costo'].apply(pd.Series)], axis=1)
-    df=pd.concat([df.drop(['pagado'], axis=1), df['pagado'].apply(pd.Series)], axis=1)
-    df=df.drop(['monto_aprobado_para_rembolso'], axis=1)
-    df=df.drop(['valor_total'], axis=1)
-    df=pd.concat([df.drop(['recibo_o_factura'], axis=1), df['recibo_o_factura'].apply(pd.Series)], axis=1)
+    #df=df.drop(['historico_de_aprobacion'], axis=1)
+    #df=pd.concat([df.drop(['centro_costo'], axis=1), df['centro_costo'].apply(pd.Series)], axis=1)
+    #df=pd.concat([df.drop(['pagado'], axis=1), df['pagado'].apply(pd.Series)], axis=1)
+    #df=df.drop(['monto_aprobado_para_rembolso'], axis=1)
+    #df=df.drop(['valor_total'], axis=1)
+    #df=pd.concat([df.drop(['recibo_o_factura'], axis=1), df['recibo_o_factura'].apply(pd.Series)], axis=1)
    
     
-    reem=df.groupby(['nombres_y_apellidos','numero_cc','nombre'],as_index=False)['valor_rembolso'].sum()
-    top=reem.head(5)
-    vf=df['reembonsable_al_cliente'].value_counts()
-    df['vf']=vf
+    #reem=df.groupby(['nombres_y_apellidos','numero_cc','nombre'],as_index=False)['valor_rembolso'].sum()
+    #top=reem.head(5)
+    #vf=df['reembonsable_al_cliente'].value_counts()
+    #df['vf']=vf
     
-    vf2=df.groupby(['nombre','reembonsable_al_cliente']).size().unstack(fill_value=0)
-    df['fecha']=pd.to_datetime(df['fecha'], errors='coerce')
-    df['año_mes']=df['fecha'].dt.strftime('%Y-%m')
+    #vf2=df.groupby(['nombre','reembonsable_al_cliente']).size().unstack(fill_value=0)
+    #df['fecha']=pd.to_datetime(df['fecha'], errors='coerce')
+    #df['año_mes']=df['fecha'].dt.strftime('%Y-%m')
     
-    cant=df.groupby(['nombre','año_mes'],as_index=False)['valor_rembolso'].sum()
-    topcenter=cant.head(5)
-    contar=df.groupby(['nombre'],as_index=False)['valor_rembolso'].count()
+    #cant=df.groupby(['nombre','año_mes'],as_index=False)['valor_rembolso'].sum()
+    #topcenter=cant.head(5)
+    #contar=df.groupby(['nombre'],as_index=False)['valor_rembolso'].count()
     #men=df.groupby(['fecha_de_pago'],as_index=False)['valor_rembolso'].sum
     #-----------------------------------------------------------------------------
     #data = pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/LUCRO/prueba.xlsx")

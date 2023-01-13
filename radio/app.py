@@ -22,8 +22,18 @@ import markdown
 #from tkinter import * from tkinter.ttk import *
 def main(opt):
     
-
-    cost_center, employees, data, tip_nov ,df, pr, cc_in =cargar.cargar_info()
+    cccgp,job,review,resource,petty,request=cargar.cargar_formularios_1()
+    wage,staff,emotional,data_automation=cargar.cargar_formularios_2()
+    data,df,delivery_control_and_return,F_AD_22_B=cargar.cargar_formularios_3()
+    project, vacation,training,F_AD_31,F_TH_10=cargar.cargar_formularios_4()
+    supervision,expense_reimbursement_ratio,billing_information,administrative_purchase_order=cargar.cargar_formularios_5()
+    supplier,control,certificate,supplier_registration, reassessment=cargar.cargar_formularios_6()
+    F_TH_22,F_TH_24,F_TH_27,F_SG_07,F_SG_08,F_SG_10=cargar.cargar_formularios_7()
+    F_SG_38,F_ST_05,F_ST_06,F_ST_07,F_ST_11,F_ST_12=cargar.cargar_formularios_8()
+    
+    
+    data, tip_nov ,df, pr, cc_in,employees,cost_center =cargar.cargar_info()
+    data, tip_nov ,df, pr, cc_in,employees,cost_center=cargar.cargar_basicos()
     cale=cargar.traer_cale()
     with open('styles.css') as f:
         
@@ -38,6 +48,7 @@ def main(opt):
     #client=gspread.authorize(creds)
     #pr=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-NOM-02/find_query.xlsx")
     #pr2=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-NOM-02/find_query.xlsx")
+    #st.write(pr)
     pr['año_mes']=pd.to_datetime(pr['fecha'])
     cantpr=pr.groupby(['centro_de_costos','año_mes'],as_index=False)['valor_del_prestamo'].sum()
     contarpr=pr.groupby(['centro_de_costos'],as_index=False)['valor_del_prestamo'].count()
@@ -359,10 +370,333 @@ def main(opt):
             return cost_center,selected_rows
             #AgGrid(cost_center_df)  
                 
+        def sa():
+            st.header('DATOS')
+            
+
+            def ad():
+                st.header('')
+                ms1=pd.unique(data['fecha'])
+                ms2=np.append(ms1,"Todos")
+                formulario= st.sidebar.multiselect(
+                            "Fecha:",
+                            ms2,
+                            default='Todos'
+                            )
+                if "Todos" in formulario: 
+                   formulario = data['fecha']
+                else:
+                   formulario=formulario
+                dataf1=data[(data.fecha.isin(formulario))]
+                st.write(dataf1)
+                def to_excel(df):
+                    output = BytesIO()
+                    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+                    df.to_excel(writer, index = False, sheet_name='Hoja1',encoding='utf-16')
+                    #Indicate workbook and worksheet for formatting
+                    workbook = writer.book
+                    worksheet = writer.sheets['Hoja1']
+                    
+                    for i, col in enumerate(df.columns):
+            # find length of column i
+                     column_len = df[col].astype(str).str.len().max()
+                     # Setting the length if the column header is larger
+                     # than the max column value length
+                     column_len = max(column_len, len(col)) + 2
+                     # set the column length
+                     worksheet.set_column(i, i, column_len)
+                     writer.save()
+                     processed_data = output.getvalue()
+                     return processed_data   
+
+                Lab_xlsx = to_excel(dataf1)
+                st.download_button(label='Resultados',
+                                        data=Lab_xlsx ,
+                                        file_name= 'df_test.xlsx') 
+                
+                
+                
+                total_1=pd.concat([petty,resource,supplier_registration,supplier,delivery_control_and_return])
+                total_2=pd.concat([expense_reimbursement_ratio,administrative_purchase_order])
+                total_3=pd.concat([certificate,review,F_AD_31,data_automation,reassessment,F_AD_22_B])
+                
+                #st.write(petty)
+                sabana=pd.concat([total_1,total_2,total_3])
+                #st.write(sabana)
+                sabana['fecha_version'] = (
+                    pd.to_datetime(sabana['fecha_version'], errors='coerce', dayfirst=True)
+                    .dt.strftime('%d-%m-%Y')
+                    )
+            
+                ad=sabana[sabana['codigo'].str.contains("AD")]
+              
+                ms1=pd.unique(ad['codigo'])
+                ms2=np.append(ms1,"Todos")
+                formulario= st.sidebar.multiselect(
+                            "Formulario:",
+                            ms2,
+                            default='Todos'
+                            )
+                if "Todos" in formulario: 
+                   formulario = ad['codigo']
+                else:
+                   formulario=formulario
+                dataf=ad[(ad.codigo.isin(formulario))]
+                st.write(dataf)
+                def to_excel(df):
+                    output = BytesIO()
+                    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+                    df.to_excel(writer, index = False, sheet_name='Hoja1',encoding='utf-16')
+                    #Indicate workbook and worksheet for formatting
+                    workbook = writer.book
+                    worksheet = writer.sheets['Hoja1']
+                    
+                    for i, col in enumerate(df.columns):
+            # find length of column i
+                     column_len = df[col].astype(str).str.len().max()
+                     # Setting the length if the column header is larger
+                     # than the max column value length
+                     column_len = max(column_len, len(col)) + 2
+                     # set the column length
+                     worksheet.set_column(i, i, column_len)
+                     writer.save()
+                     processed_data = output.getvalue()
+                     return processed_data   
+
+                Lab_xlsx = to_excel(dataf)
+                st.download_button(label='Resultados',
+                                        data=Lab_xlsx ,
+                                        file_name= 'df_test.xlsx') 
+            def com():
+                st.header('')
+                             
+                total_1=pd.concat([cccgp, job,request,wage,staff,emotional])
+                total_6=pd.concat([df,project, vacation,training,F_TH_10])
+                total_3=pd.concat([supervision,billing_information])
+                total_4=pd.concat([control,F_TH_22,F_TH_24,F_TH_27,F_SG_07,F_SG_08,F_SG_10])
+                total_5=pd.concat([F_SG_38,F_ST_05,F_ST_06,F_ST_07,F_ST_11,F_ST_12])
+                
+                sabana=pd.concat([total_1,total_3,total_4,total_5,total_6])
+                sabana['fecha_version'] = (
+                    pd.to_datetime(sabana['fecha_version'], errors='coerce', dayfirst=True)
+                    .dt.strftime('%d-%m-%Y')
+                    )
+            
+                com=sabana[sabana['codigo'].str.contains("CON")]
+                
+                ms1=pd.unique(com['codigo'])
+                ms2=np.append(ms1,"Todos")
+                formulario= st.sidebar.multiselect(
+                            "Formulario:",
+                            ms2,
+                            default='Todos'
+                            )
+                if "Todos" in formulario: 
+                   formulario = com['codigo']
+                else:
+                   formulario=formulario
+                dataf=com[(com.codigo.isin(formulario))]
+                st.write(dataf)
+                def to_excel(df):
+                    output = BytesIO()
+                    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+                    df.to_excel(writer, index = False, sheet_name='Hoja1',encoding='utf-16')
+                    #Indicate workbook and worksheet for formatting
+                    workbook = writer.book
+                    worksheet = writer.sheets['Hoja1']
+                    
+                    for i, col in enumerate(df.columns):
+            # find length of column i
+                     column_len = df[col].astype(str).str.len().max()
+                     # Setting the length if the column header is larger
+                     # than the max column value length
+                     column_len = max(column_len, len(col)) + 2
+                     # set the column length
+                     worksheet.set_column(i, i, column_len)
+                     writer.save()
+                     processed_data = output.getvalue()
+                     return processed_data   
+
+                Lab_xlsx = to_excel(dataf)
+                st.download_button(label='Resultados',
+                                        data=Lab_xlsx ,
+                                        file_name= 'df_test.xlsx') 
+                
+            def th():
+                st.header('')
+                
+                
+                               
+                total_1=pd.concat([cccgp,project,vacation,F_TH_27,training])
+                total_2=pd.concat([F_TH_24,F_TH_22,job,F_TH_10,F_TH_10,staff,emotional])
+                
+    
+                sabana=pd.concat([total_1,total_2])
+                sabana['fecha_version'] = (
+                    pd.to_datetime(sabana['fecha_version'], errors='coerce', dayfirst=True)
+                    .dt.strftime('%d-%m-%Y')
+                    )
+            
+                th=sabana[sabana['codigo'].str.contains("TH")]
+                ms1=pd.unique(th['codigo'])
+                ms2=np.append(ms1,"Todos")
+                formulario= st.sidebar.multiselect(
+                            "Formulario:",
+                            ms2,
+                            default='Todos'
+                            )
+                if "Todos" in formulario: 
+                   formulario = th['codigo']
+                else:
+                   formulario=formulario
+                dataf=th[(th.codigo.isin(formulario))]
+                st.write(dataf)
+                def to_excel(df):
+                    output = BytesIO()
+                    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+                    df.to_excel(writer, index = False, sheet_name='Hoja1',encoding='utf-16')
+                    #Indicate workbook and worksheet for formatting
+                    workbook = writer.book
+                    worksheet = writer.sheets['Hoja1']
+                    
+                    for i, col in enumerate(df.columns):
+            # find length of column i
+                     column_len = df[col].astype(str).str.len().max()
+                     # Setting the length if the column header is larger
+                     # than the max column value length
+                     column_len = max(column_len, len(col)) + 2
+                     # set the column length
+                     worksheet.set_column(i, i, column_len)
+                     writer.save()
+                     processed_data = output.getvalue()
+                     return processed_data   
+
+                Lab_xlsx = to_excel(dataf)
+                st.download_button(label='Resultados',
+                                        data=Lab_xlsx ,
+                                        file_name= 'df_test.xlsx') 
+            
+            def sg():
+                st.header('')
+                
+                total_1=pd.concat([F_SG_38,F_SG_07,F_SG_08,F_SG_10])
+           
+                sabana=pd.concat([total_1])
+                sabana['fecha_version'] = (
+                    pd.to_datetime(sabana['fecha_version'], errors='coerce', dayfirst=True)
+                    .dt.strftime('%d-%m-%Y')
+                    )
+            
+                sg=sabana[sabana['codigo'].str.contains("SG")]
+                ms1=pd.unique(sg['codigo'])
+                ms2=np.append(ms1,"Todos")
+                formulario= st.sidebar.multiselect(
+                            "Formulario:",
+                            ms2,
+                            default='Todos'
+                            )
+                if "Todos" in formulario: 
+                   formulario = sg['codigo']
+                else:
+                   formulario=formulario
+                dataf=sg[(sg.codigo.isin(formulario))]
+                st.write(dataf)
+                def to_excel(df):
+                    output = BytesIO()
+                    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+                    df.to_excel(writer, index = False, sheet_name='Hoja1',encoding='utf-16')
+                    #Indicate workbook and worksheet for formatting
+                    workbook = writer.book
+                    worksheet = writer.sheets['Hoja1']
+                    
+                    for i, col in enumerate(df.columns):
+            # find length of column i
+                     column_len = df[col].astype(str).str.len().max()
+                     # Setting the length if the column header is larger
+                     # than the max column value length
+                     column_len = max(column_len, len(col)) + 2
+                     # set the column length
+                     worksheet.set_column(i, i, column_len)
+                     writer.save()
+                     processed_data = output.getvalue()
+                     return processed_data   
+
+                Lab_xlsx = to_excel(dataf)
+                st.download_button(label='Resultados',
+                                        data=Lab_xlsx ,
+                                        file_name= 'df_test.xlsx') 
+                
+            def fst():
+                st.header('')
+
+                total_5=pd.concat([F_ST_05,F_ST_06,F_ST_07,F_ST_11,F_ST_12])
+      
+                sabana=pd.concat([total_5])
+                sabana['fecha_version'] = (
+                    pd.to_datetime(sabana['fecha_version'], errors='coerce', dayfirst=True)
+                    .dt.strftime('%d-%m-%Y')
+                    )
+            
+                fst=sabana[sabana['codigo'].str.contains("ST")]
+                ms1=pd.unique(fst['codigo'])
+                ms2=np.append(ms1,"Todos")
+                formulario= st.sidebar.multiselect(
+                            "Formulario:",
+                            ms2,
+                            default='Todos'
+                            )
+                if "Todos" in formulario: 
+                   formulario = fst['codigo']
+                else:
+                   formulario=formulario
+                dataf=fst[(fst.codigo.isin(formulario))]
+                st.write(dataf)
+                def to_excel(df):
+                    output = BytesIO()
+                    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+                    df.to_excel(writer, index = False, sheet_name='Hoja1',encoding='utf-16')
+                    #Indicate workbook and worksheet for formatting
+                    workbook = writer.book
+                    worksheet = writer.sheets['Hoja1']
+                    
+                    for i, col in enumerate(df.columns):
+            # find length of column i
+                     column_len = df[col].astype(str).str.len().max()
+                     # Setting the length if the column header is larger
+                     # than the max column value length
+                     column_len = max(column_len, len(col)) + 2
+                     # set the column length
+                     worksheet.set_column(i, i, column_len)
+                     writer.save()
+                     processed_data = output.getvalue()
+                     return processed_data   
+
+                Lab_xlsx = to_excel(dataf)
+                st.download_button(label='Resultados',
+                                        data=Lab_xlsx ,
+                                        file_name= 'df_test.xlsx') 
+            
+            filpre=st.sidebar.selectbox('',options=['AD','CON','TH','SG','ST'])
+            if filpre == 'AD':
+                ad()
+            elif filpre == 'CON':
+                com()
+            elif filpre == 'TH':
+                th()
+            elif filpre == 'SG':
+                sg()
+            elif filpre == 'ST':
+                fst()
+
+            
+
+            #df_1['fecha_version'] = pd.to_datetime(df_1['fecha_version'], format='%Y/%m/%d').dt.strftime('%d-%m-%Y')
             
             
+
+                
             
-            
+
             
         def em():
             st.header('EMPLEADOS')
@@ -424,12 +758,13 @@ def main(opt):
                                     file_name= 'df_test.xlsx')             
             
        
-        filpre=st.sidebar.selectbox('',options=['Centros de Costos','Empleados'])
+        filpre=st.sidebar.selectbox('',options=['Centros de Costos','Empleados','Datos'])
         if filpre == 'Centros de Costos':
             cc()
         elif filpre == 'Empleados':
             em()
-        
+        elif filpre == 'Datos':
+            sa()
         
         
     
@@ -592,7 +927,45 @@ def main(opt):
         #plt.title("Mince Pie Consumption Study Results")
         #st.plotly_chart(fig,use_container_width=True)
 #-----------------------------------------------------------------------------
+         st.header("Reporte Formularios")
          
+         ms1=pd.unique(data['fecha'])
+         ms2=np.append(ms1,"Todos")
+         formulario= st.multiselect(
+                     "Fecha:",
+                     ms2,
+                     default='Todos'
+                     )
+         if "Todos" in formulario: 
+            formulario = data['fecha']
+         else:
+            formulario=formulario
+         dataf1=data[(data.fecha.isin(formulario))]
+         st.write(dataf1)
+         def to_excel(df):
+             output = BytesIO()
+             writer = pd.ExcelWriter(output, engine='xlsxwriter')
+             df.to_excel(writer, index = False, sheet_name='Hoja1',encoding='utf-16')
+             #Indicate workbook and worksheet for formatting
+             workbook = writer.book
+             worksheet = writer.sheets['Hoja1']
+             
+             for i, col in enumerate(df.columns):
+     # find length of column i
+              column_len = df[col].astype(str).str.len().max()
+              # Setting the length if the column header is larger
+              # than the max column value length
+              column_len = max(column_len, len(col)) + 2
+              # set the column length
+              worksheet.set_column(i, i, column_len)
+              writer.save()
+              processed_data = output.getvalue()
+              return processed_data   
+
+         Lab_xlsx = to_excel(dataf1)
+         st.download_button(label='Resultados',
+                                 data=Lab_xlsx ,
+                                 file_name= 'df_test.xlsx') 
     #------------------------------------------------------------------------------    
 
     #-----------------------------------------------------------------------------
@@ -689,7 +1062,7 @@ def main(opt):
                   #  processed_data = output.getvalue()
                    # return processed_data
          Lab_xlsx = to_excel(dataf)
-         st.download_button(label='Resultados en XLSX',
+         st.download_button(label='Resultados en Excel',
                                     data=Lab_xlsx ,
                                     file_name= 'df_test.xlsx')  
          

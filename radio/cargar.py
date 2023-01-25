@@ -53,7 +53,7 @@ def _normalize(s):
 
 	return s
 
-@st.experimental_memo(ttl=300)
+@st.experimental_memo(ttl=900)
 def cargar_info():
     token = traer_toc()
     headers = {'Authorization': f'Bearer {token}'}
@@ -90,9 +90,9 @@ def cargar_info():
         response = requests.get(f"{BASE_URL}/api/v1/expense_reimbursement", headers=headers)
         trans_data = _normalize(response.text)
         dict_data = eval(trans_data)
-        df = pd.DataFrame(dict_data['data'])
+        F_AD_05 = pd.DataFrame(dict_data['data'])
     except:
-        df = pd.DataFrame()
+        F_AD_05 = pd.DataFrame()
     try:    
         response = requests.get(f"{BASE_URL}/api/v1/loan", headers=headers)
         trans_data = _normalize(response.text)
@@ -109,7 +109,7 @@ def cargar_info():
         cc_in = pd.DataFrame()
     
     descargar()
-    return cost_center, employees, data, tip_nov ,df, pr, cc_in
+    return cost_center, employees, data, tip_nov ,F_AD_05, pr, cc_in
 
 def descargar():
     try:
@@ -127,7 +127,7 @@ def cargar_excel(files):
     dict_data = eval(trans_data)
     return dict_data 
 
-@st.experimental_memo(ttl=300)
+@st.experimental_memo(ttl=900)
 def traer_cale():
     token = traer_toc()
     headers = {'Authorization': f'Bearer {token}'}
@@ -153,11 +153,18 @@ def mod_cale(ini,fin):
     return dict_data 
 
 
-@st.experimental_memo(ttl=300)
+@st.experimental_memo(ttl=900)
 def cargar_formularios_1():
     token = traer_toc()
     headers = {'Authorization': f'Bearer {token}'}
-
+    try:
+        response = requests.get(f"{BASE_URL}/api/v1/contractor_income", headers=headers)
+        trans_data = _normalize(response.text)
+        dict_data = eval(trans_data)
+        F_AD_31 = pd.DataFrame(dict_data['data'])
+    except:
+        F_AD_31 = pd.DataFrame()
+        
     try:
         response = requests.get(f"{BASE_URL}/api/v1/request_for_advances", headers=headers)
         trans_data = _normalize(response.text)
@@ -169,118 +176,95 @@ def cargar_formularios_1():
         response = requests.get(f"{BASE_URL}/api/v1/petty_cash_reimbursement", headers=headers)
         trans_data = _normalize(response.text)
         dict_data = eval(trans_data)
-        petty = pd.DataFrame(dict_data['data'])
+        F_AD_07 = pd.DataFrame(dict_data['data'])
     except:
-        petty = pd.DataFrame()
+        F_AD_07 = pd.DataFrame()
     try:
         response = requests.get(f"{BASE_URL}/api/v1/resource_request", headers=headers)
         trans_data = _normalize(response.text)
         dict_data = eval(trans_data)
-        resource = pd.DataFrame(dict_data['data'])
+        F_AD_14 = pd.DataFrame(dict_data['data'])
     except:
-        resource = pd.DataFrame()
+        F_AD_14 = pd.DataFrame()
     try:
         response = requests.get(f"{BASE_URL}/api/v1/review_of_accounts_receivable_invoices", headers=headers)
         trans_data = _normalize(response.text)
         dict_data = eval(trans_data)
-        review = pd.DataFrame(dict_data['data'])
+        F_AD_16 = pd.DataFrame(dict_data['data'])
     except:
-        review = pd.DataFrame()
+        F_AD_16 = pd.DataFrame()
    
-    try:
-        response = requests.get(f"{BASE_URL}/api/v1/job_applicant", headers=headers)
-        trans_data = _normalize(response.text)
-        dict_data = eval(trans_data)
-        job = pd.DataFrame(dict_data['data'])
-    except:
-        job = pd.DataFrame()
-    try:
-        response = requests.get(f"{BASE_URL}/api/v1/cccgp_committee_requests", headers=headers)
-        trans_data = _normalize(response.text)
-        dict_data = eval(trans_data)
-        cccgp = pd.DataFrame(dict_data['data'])
-    except:
-        cccgp = pd.DataFrame()
-
     descargar()
-    return cccgp,job,review,resource,petty,request
+    return F_AD_31,F_AD_16,F_AD_14,F_AD_07,request
 
 
 @st.experimental_memo(ttl=900)
 def cargar_formularios_2():
-        token = traer_toc()
-        headers = {'Authorization': f'Bearer {token}'}
-       
-        try:
-         response = requests.get(f"{BASE_URL}/api/v1/supplier_customer_data_automation", headers=headers)
+    token = traer_toc()
+    headers = {'Authorization': f'Bearer {token}'}
+    try:        
+         response = requests.get(f"{BASE_URL}/api/v1/data_update", headers=headers)
          trans_data = _normalize(response.text)
          dict_data = eval(trans_data)
-         data_automation = pd.DataFrame(dict_data['data'])
-        except:
-         data_automation = pd.DataFrame()
-        try:
+         F_TH_13_B = pd.DataFrame(dict_data['data'])
+    except:
+         F_TH_13_B = pd.DataFrame()
+    try:
          response = requests.get(f"{BASE_URL}/api/v1/emotional_salary_control", headers=headers)
          trans_data = _normalize(response.text)
          dict_data = eval(trans_data)
-         emotional = pd.DataFrame(dict_data['data'])
-        except:
-         emotional = pd.DataFrame()
-        try:
-         response = requests.get(f"{BASE_URL}/api/v1/staff_requirement", headers=headers)
-         trans_data = _normalize(response.text)
-         dict_data = eval(trans_data)
-         staff = pd.DataFrame(dict_data['data'])
-        except:
-         staff = pd.DataFrame()
-        try:
-         response = requests.get(f"{BASE_URL}/api/v1/wage_equalization", headers=headers)
-         trans_data = _normalize(response.text)
-         dict_data = eval(trans_data)
-         wage = pd.DataFrame(dict_data['data'])
-        except:
-         wage = pd.DataFrame()  
+         F_TH_02 = pd.DataFrame(dict_data['data'])
+    except:
+         F_TH_02 = pd.DataFrame()
+    try:
+        response = requests.get(f"{BASE_URL}/api/v1/induction_roadmap", headers=headers)
+        trans_data = _normalize(response.text)
+        dict_data = eval(trans_data)
+        F_TH_10 = pd.DataFrame(dict_data['data'])
+    except:
+        F_TH_10 = pd.DataFrame()
          
-        descargar()
-        return   wage,staff,emotional,data_automation
+    descargar()
+    return   F_TH_02,F_TH_13_B,F_TH_10
     
 @st.experimental_memo(ttl=900)    
 def cargar_formularios_3():
     token = traer_toc()
     headers = {'Authorization': f'Bearer {token}'}
-
-    try:        
-        response = requests.get(f"{BASE_URL}/api/v1/novelty", headers=headers)
-        trans_data = _normalize(response.text)
-        dict_data = eval(trans_data)
-        data = pd.DataFrame(dict_data['data'])
+    try:
+     response = requests.get(f"{BASE_URL}/api/v1/supplier_customer_data_automation", headers=headers)
+     trans_data = _normalize(response.text)
+     dict_data = eval(trans_data)
+     F_AD_29 = pd.DataFrame(dict_data['data'])
     except:
-        data = pd.DataFrame()
+     F_AD_29 = pd.DataFrame()
+    
     try:         
         response = requests.get(f"{BASE_URL}/api/v1/expense_reimbursement", headers=headers)
         trans_data = _normalize(response.text)
         dict_data = eval(trans_data)
-        df = pd.DataFrame(dict_data['data'])
+        F_AD_05 = pd.DataFrame(dict_data['data'])
     except:
-        df = pd.DataFrame()
+        F_AD_05 = pd.DataFrame()
         
     try:         
         response = requests.get(f"{BASE_URL}/api/v1/delivery_control_and_return", headers=headers)
         trans_data = _normalize(response.text)
         dict_data = eval(trans_data)
-        delivery_control_and_return = pd.DataFrame(dict_data['data'])
+        F_AD_22_A = pd.DataFrame(dict_data['data'])
     except:
-        delivery_control_and_return = pd.DataFrame()
+        F_AD_22_A = pd.DataFrame()
         
     try:         
         response = requests.get(f"{BASE_URL}/api/v1/control_and_monitoring_of_suppliers", headers=headers)
         trans_data = _normalize(response.text)
         dict_data = eval(trans_data)
-        F_AD_22_B  = pd.DataFrame(dict_data['data'])
+        F_AD_24_A = pd.DataFrame(dict_data['data'])
     except:
-        F_AD_22_B = pd.DataFrame()
+        F_AD_24_A = pd.DataFrame()
 
     descargar()
-    return  data,df,delivery_control_and_return,F_AD_22_B
+    return  F_AD_29,F_AD_05,F_AD_22_A,F_AD_24_A
 
 
 @st.experimental_memo(ttl=900)
@@ -292,42 +276,27 @@ def cargar_formularios_4():
         response = requests.get(f"{BASE_URL}/api/v1/training_tracking", headers=headers)
         trans_data = _normalize(response.text)
         dict_data = eval(trans_data)
-        training = pd.DataFrame(dict_data['data'])
+        F_TH_25 = pd.DataFrame(dict_data['data'])
     except:
-        training = pd.DataFrame()
+        F_TH_25 = pd.DataFrame()
+    
     try:
-        response = requests.get(f"{BASE_URL}/api/v1/vacation_request", headers=headers)
+        response = requests.get(f"{BASE_URL}/api/v1/job_applicant", headers=headers)
         trans_data = _normalize(response.text)
         dict_data = eval(trans_data)
-        vacation = pd.DataFrame(dict_data['data'])
+        F_TH_13_A = pd.DataFrame(dict_data['data'])
     except:
-        vacation = pd.DataFrame()
+        F_TH_13_A = pd.DataFrame()
     try:
-        response = requests.get(f"{BASE_URL}/api/v1/project_transfer_request", headers=headers)
+        response = requests.get(f"{BASE_URL}/api/v1/cccgp_committee_requests", headers=headers)
         trans_data = _normalize(response.text)
         dict_data = eval(trans_data)
-        project = pd.DataFrame(dict_data['data'])
+        F_TH_15 = pd.DataFrame(dict_data['data'])
     except:
-        project = pd.DataFrame()
-
-    try:
-        response = requests.get(f"{BASE_URL}/api/v1/contractor_income", headers=headers)
-        trans_data = _normalize(response.text)
-        dict_data = eval(trans_data)
-        F_AD_31 = pd.DataFrame(dict_data['data'])
-    except:
-        F_AD_31 = pd.DataFrame()
-        
-    try:
-        response = requests.get(f"{BASE_URL}/api/v1/induction_roadmap", headers=headers)
-        trans_data = _normalize(response.text)
-        dict_data = eval(trans_data)
-        F_TH_10 = pd.DataFrame(dict_data['data'])
-    except:
-        F_TH_10 = pd.DataFrame()
+        F_TH_15 = pd.DataFrame()
 
     descargar()
-    return project, vacation,training,F_AD_31,F_TH_10
+    return F_TH_25,F_TH_13_A,F_TH_15
 
 
 @st.experimental_memo(ttl=900)
@@ -360,16 +329,16 @@ def cargar_formularios_5():
         billing_information = pd.DataFrame()   
         
     try:
-        response = requests.get(f"{BASE_URL}/api/v1/administrative_purchase_order", headers=headers)
-        trans_data = _normalize(response.text)
-        dict_data = eval(trans_data)
-        administrative_purchase_order = pd.DataFrame(dict_data['data'])
+      response = requests.get(f"{BASE_URL}/api/v1/control_and_monitoring_of_suppliers", headers=headers)
+      trans_data = _normalize(response.text)
+      dict_data = eval(trans_data)
+      control = pd.DataFrame(dict_data['data'])
     except:
-        administrative_purchase_order = pd.DataFrame()   
+      control = pd.DataFrame() 
         
 
     descargar()
-    return supervision,expense_reimbursement_ratio,billing_information,administrative_purchase_order
+    return supervision,expense_reimbursement_ratio,billing_information,control
 
 @st.experimental_memo(ttl=900)
 def cargar_formularios_6():
@@ -379,40 +348,47 @@ def cargar_formularios_6():
       response = requests.get(f"{BASE_URL}/api/v1/supplier_registration", headers=headers)
       trans_data = _normalize(response.text)
       dict_data = eval(trans_data)
-      supplier_registration = pd.DataFrame(dict_data['data'])
+      F_AD_17 = pd.DataFrame(dict_data['data'])
     except:
-      supplier_registration = pd.DataFrame()
+      F_AD_17 = pd.DataFrame()
     try:
       response = requests.get(f"{BASE_URL}/api/v1/certificate_of_delivery_of_work_tools", headers=headers)
       trans_data = _normalize(response.text)
       dict_data = eval(trans_data)
-      certificate = pd.DataFrame(dict_data['data'])
+      F_AD_19 = pd.DataFrame(dict_data['data'])
     except:
-      certificate = pd.DataFrame()
+      F_AD_19 = pd.DataFrame()
     try:
-      response = requests.get(f"{BASE_URL}/api/v1/control_and_monitoring_of_suppliers", headers=headers)
-      trans_data = _normalize(response.text)
-      dict_data = eval(trans_data)
-      control = pd.DataFrame(dict_data['data'])
+        response = requests.get(f"{BASE_URL}/api/v1/administrative_purchase_order", headers=headers)
+        trans_data = _normalize(response.text)
+        dict_data = eval(trans_data)
+        F_AD_06 = pd.DataFrame(dict_data['data'])
     except:
-      control = pd.DataFrame()
+        F_AD_06 = pd.DataFrame()    
     try:
       response = requests.get(f"{BASE_URL}/api/v1/supplier_evaluation", headers=headers)
       trans_data = _normalize(response.text)
       dict_data = eval(trans_data)
-      supplier = pd.DataFrame(dict_data['data'])
+      F_AD_24_B = pd.DataFrame(dict_data['data'])
     except:
-      supplier = pd.DataFrame()
+      F_AD_24_B = pd.DataFrame()
     try:
       response = requests.get(f"{BASE_URL}/api/v1/supplier_reassessment", headers=headers)
       trans_data = _normalize(response.text)
       dict_data = eval(trans_data)
-      reassessment = pd.DataFrame(dict_data['data'])
+      F_AD_24_D = pd.DataFrame(dict_data['data'])
     except:
-      reassessment= pd.DataFrame()
+      F_AD_14_D= pd.DataFrame()
+    try:
+      response = requests.get(f"{BASE_URL}/api/v1/return_control", headers=headers)
+      trans_data = _normalize(response.text)
+      dict_data = eval(trans_data)
+      F_AD_22_B = pd.DataFrame(dict_data['data'])
+    except:
+      F_AD_22_B= pd.DataFrame()
 
     descargar()
-    return  supplier,control,certificate,supplier_registration, reassessment
+    return  F_AD_24_B,F_AD_06,F_AD_19,F_AD_17, F_AD_24_D,F_AD_22_B
 
 @st.experimental_memo(ttl=900)
 def cargar_formularios_7():
@@ -425,23 +401,7 @@ def cargar_formularios_7():
       F_TH_22 = pd.DataFrame(dict_data['data'])
     except:
       F_TH_22 = pd.DataFrame()
-      
-    try:
-      response = requests.get(f"{BASE_URL}/api/v1/withdrawal_from_the_company", headers=headers)
-      trans_data = _normalize(response.text)
-      dict_data = eval(trans_data)
-      F_TH_24 = pd.DataFrame(dict_data['data'])
-    except:
-      F_TH_24 = pd.DataFrame()
-      
-    try:
-      response = requests.get(f"{BASE_URL}/api/v1/evaluation_trial_period", headers=headers)
-      trans_data = _normalize(response.text)
-      dict_data = eval(trans_data)
-      F_TH_27 = pd.DataFrame(dict_data['data'])
-    except:
-      F_TH_27 = pd.DataFrame()
-      
+          
     try:
       response = requests.get(f"{BASE_URL}/api/v1/audit_check", headers=headers)
       trans_data = _normalize(response.text)
@@ -468,7 +428,7 @@ def cargar_formularios_7():
       
       
     descargar()
-    return F_TH_22,F_TH_24,F_TH_27,F_SG_07,F_SG_08,F_SG_10
+    return F_TH_22,F_SG_07,F_SG_08,F_SG_10
 
 
 @st.experimental_memo(ttl=900)
@@ -523,8 +483,16 @@ def cargar_formularios_8():
     except:
       F_ST_12 = pd.DataFrame()
       
+    try:
+      response = requests.get(f"{BASE_URL}/api/v1/density_control", headers=headers)
+      trans_data = _normalize(response.text)
+      dict_data = eval(trans_data)
+      F_ST_19 = pd.DataFrame(dict_data['data'])
+    except:
+      F_ST_19 = pd.DataFrame()
+      
     descargar()
-    return F_SG_38,F_ST_05,F_ST_06,F_ST_07,F_ST_11,F_ST_12
+    return F_SG_38,F_ST_05,F_ST_06,F_ST_07,F_ST_11,F_ST_12,F_ST_19
 
 
 @st.experimental_memo(ttl=900)

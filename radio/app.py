@@ -22,17 +22,17 @@ import markdown
 #from tkinter import * from tkinter.ttk import *
 def main(opt):
     
-    cccgp,job,review,resource,petty,request=cargar.cargar_formularios_1()
-    wage,staff,emotional,data_automation=cargar.cargar_formularios_2()
-    data,df,delivery_control_and_return,F_AD_22_B=cargar.cargar_formularios_3()
-    project, vacation,training,F_AD_31,F_TH_10=cargar.cargar_formularios_4()
-    supervision,expense_reimbursement_ratio,billing_information,administrative_purchase_order=cargar.cargar_formularios_5()
-    supplier,control,certificate,supplier_registration, reassessment=cargar.cargar_formularios_6()
-    F_TH_22,F_TH_24,F_TH_27,F_SG_07,F_SG_08,F_SG_10=cargar.cargar_formularios_7()
-    F_SG_38,F_ST_05,F_ST_06,F_ST_07,F_ST_11,F_ST_12=cargar.cargar_formularios_8()
+    F_AD_31,F_AD_16,F_AD_14,F_AD_07,request=cargar.cargar_formularios_1()
+    F_TH_02,F_TH_13_B,F_TH_10=cargar.cargar_formularios_2()
+    F_AD_29,F_AD_05,F_AD_22_A,F_AD_24_A=cargar.cargar_formularios_3()
+    F_TH_25,F_TH_13_A,F_TH_15=cargar.cargar_formularios_4()
+    supervision,expense_reimbursement_ratio,billing_information,control=cargar.cargar_formularios_5()
+    F_AD_24_B,F_AD_06,F_AD_19,F_AD_17, F_AD_24_D,F_AD_22_B=cargar.cargar_formularios_6()
+    F_TH_22,F_SG_07,F_SG_08,F_SG_10=cargar.cargar_formularios_7()
+    F_SG_38,F_ST_05,F_ST_06,F_ST_07,F_ST_11,F_ST_12,F_ST_19=cargar.cargar_formularios_8()
     
     
-    data, tip_nov ,df, pr, cc_in,employees,cost_center =cargar.cargar_info()
+    data, tip_nov ,F_AD_05, pr, cc_in,employees,cost_center =cargar.cargar_info()
     data, tip_nov ,df, pr, cc_in,employees,cost_center=cargar.cargar_basicos()
     cale=cargar.traer_cale()
     with open('styles.css') as f:
@@ -48,7 +48,7 @@ def main(opt):
     #client=gspread.authorize(creds)
     #pr=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-NOM-02/find_query.xlsx")
     #pr2=pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/PREVEO/preveo/F-NOM-02/find_query.xlsx")
-    #st.write(pr)
+    #st.write(F_ST_19)
     pr['año_mes']=pd.to_datetime(pr['fecha'])
     cantpr=pr.groupby(['centro_de_costos','año_mes'],as_index=False)['valor_del_prestamo'].sum()
     contarpr=pr.groupby(['centro_de_costos'],as_index=False)['valor_del_prestamo'].count()
@@ -89,7 +89,8 @@ def main(opt):
     #data = pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/LUCRO/prueba.xlsx")
     data=data.drop(["codigo_centro_de_costos"],axis=1) 
     data.columns = data.columns.str.replace(' ', '_') 
-    data['fecha_inicial_novedad'] = pd.to_datetime(data['fecha_inicial_novedad'], errors='coerce')
+    data['fecha_inicial_novedad'] = pd.to_datetime(data['fecha_inicial_novedad'],format='%Y-%m-%d')
+    
     data['fecha_final_novedad'] = pd.to_datetime(data['fecha_final_novedad'], errors='coerce')
     data['documento_de_identificacion'] = data['documento_de_identificacion'].astype(str)
     data['año_mes']=data['fecha_inicial_novedad'].dt.strftime('%Y-%m')
@@ -927,8 +928,7 @@ def main(opt):
         #plt.title("Mince Pie Consumption Study Results")
         #st.plotly_chart(fig,use_container_width=True)
 #-----------------------------------------------------------------------------
-         st.header("Reporte Formularios")
-         
+         st.header("Reporte Novedades")
          ms1=pd.unique(data['fecha'])
          ms2=np.append(ms1,"Todos")
          formulario= st.multiselect(
@@ -1015,21 +1015,6 @@ def main(opt):
                inplace=True)
          st.write(dataf)
 
-         
-         
-         
-         #data_selection[['nombre_del_empleado','documento_de_identificacion','centro_de_costos','dias_laborados','año_mes','tipo_de_novedad','Alerta']]    
-         
-         #dataf=dataf[['nombre_del_empleado','documento_de_identificacion',
-          #              'fecha_ingreso_nomina','centro_de_costos','codigo_de_costo',
-           #             'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
-            #            'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']]
-         
-         #st.subheader("Tabla Sugeridos")
-         #st.write(dataf[['nombre_del_empleado','documento_de_identificacion',
-          #              'fecha_ingreso_nomina','centro_de_costos',
-           #              'dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
-            #             'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']])
          def to_excel(df):
              output = BytesIO()
              writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -1050,58 +1035,13 @@ def main(opt):
              writer.save()
              processed_data = output.getvalue()
              return processed_data   
-         #def to_excel(dataf):
-          #          output = BytesIO()
-           #         writer = pd.ExcelWriter(output, engine='xlsxwriter')
-            #        dataf.to_excel(writer, index=False, sheet_name='Sheet1')
-             #       workbook = writer.book
-              #      worksheet = writer.sheets['Sheet1']
-               #     format1 = workbook.add_format({'num_format': '0.00'}) 
-                #    worksheet.set_column('A:A', None, format1)  
-                 #   writer.save()
-                  #  processed_data = output.getvalue()
-                   # return processed_data
+         
          Lab_xlsx = to_excel(dataf)
          st.download_button(label='Resultados en Excel',
                                     data=Lab_xlsx ,
                                     file_name= 'df_test.xlsx')  
          
          
-         
-         
-         
-         st.header("Reporte Novedades")
-         try:
-         
-             excel=pd.read_excel('Reporte Novedades.xlsx',engine="openpyxl")
-             
-             excel.index = np.arange(1, len(excel) + 1)
-    
-             contandito=excel.iloc[:, 0].count()
-             
-             fig = go.Figure(go.Indicator(
-              mode = "number",
-              value = contandito,
-              title = {"text": "Novedades<br><span style='font-size:0.8em;color:gray'>"},
-              #domain = {'row': 0, 'column': 1}))
-              ))
-                  
-    
-             fig.update_layout(height=100,width=100,
-                             paper_bgcolor = "lightgray",margin = {'t':30, 'b':10, 'l':0,'r':0},
-            template = {'data' : {'indicator': [{'title': {'text': "Novedades"},
-            }]
-                             }})
-             st.plotly_chart(fig,use_container_width=True)  
-             
-             #st.metric('Novedades',value=contandito)
-             st.write(excel)
-             excel2 = to_excel(excel)
-             st.download_button(label='Reporte Novedades',
-                               data=excel2,
-                               file_name= 'Reporte Novedades.xlsx')  
-         except:
-             st.info('No hay reporte de novedades para este mes')
          a=list(dataf['Centro de Costos'].unique())
          c=list(cost_center['centro_de_costo'].unique())
          cen_sin=list(set(c)-set(a))

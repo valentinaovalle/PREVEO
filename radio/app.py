@@ -811,6 +811,7 @@ def main(opt):
             empleado=[empleado]
         
          data_selection=dataf[(dataf.nombre_del_empleado.isin(empleado)) & (dataf.año_mes==mes)]
+         
          st.subheader("Novedades")
         #data_selection = dataf.query("centro_de_costos== @cent_cost_filter and nombre_del_empleado == @empleado ")
          fig2 = make_subplots()
@@ -929,7 +930,11 @@ def main(opt):
         #st.plotly_chart(fig,use_container_width=True)
 #-----------------------------------------------------------------------------
          st.header("Reporte Novedades")
-         ms1=pd.unique(data['fecha'])
+         data['fecha_inicial_novedad'] = pd.to_datetime(data['fecha_inicial_novedad']) 
+         data['fecha_inicial_novedad']=data['fecha_inicial_novedad'].dt.strftime('%Y-%m-%d')
+         data['fecha_final_novedad'] = pd.to_datetime(dataf['fecha_final_novedad']) 
+         data['fecha_final_novedad']=dataf['fecha_final_novedad'].dt.strftime('%Y-%m-%d')
+         ms1=pd.unique(data['año_mes'])
          ms2=np.append(ms1,"Todos")
          formulario= st.multiselect(
                      "Fecha:",
@@ -937,10 +942,10 @@ def main(opt):
                      default='Todos'
                      )
          if "Todos" in formulario: 
-            formulario = data['fecha']
+            formulario = data['año_mes']
          else:
             formulario=formulario
-         dataf1=data[(data.fecha.isin(formulario))]
+         dataf1=data[(data.año_mes.isin(formulario))]
          st.write(dataf1)
          def to_excel(df):
              output = BytesIO()

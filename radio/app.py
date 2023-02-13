@@ -1147,7 +1147,7 @@ def main(opt):
              "Inserta fecha",
              value=(datetime.datetime(today.year, today.month, int(day_from.values[0])), datetime.datetime(today.year, today.month, int(day_to.values[0]))),
              min_value=datetime.datetime(today.year, today.month, 1),
-             max_value=datetime.datetime(today.year, today.month, 30))
+             max_value=datetime.datetime(today.year, today.month, 28))
              
              submitted = st.form_submit_button("Guardar")
              if submitted:

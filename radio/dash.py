@@ -3,6 +3,7 @@ im = Image.open("img/favicon.ico")
 import streamlit as st
 from app import main
 from cargar import cargar_info
+ 
 
 st.set_page_config(
   page_title="Tableros Preveo", layout="wide",

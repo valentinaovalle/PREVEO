@@ -931,7 +931,7 @@ def main(opt):
         #st.plotly_chart(fig,use_container_width=True)
 #-----------------------------------------------------------------------------
          st.header("Reporte Novedades")
-         st.write(data)
+         #st.write(data)
          data['fecha_inicial_novedad'] = pd.to_datetime(data['fecha_inicial_novedad']) 
          data['fecha_inicial_novedad']=data['fecha_inicial_novedad'].dt.strftime('%Y-%m-%d')
          data['fecha_final_novedad'] = pd.to_datetime(dataf['fecha_final_novedad']) 

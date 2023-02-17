@@ -100,10 +100,10 @@ def main(opt):
     
     data['Alerta']=""
     for i in range(len(data['nombre_del_empleado'])):
-        if data.iloc[i,3] == 30:
-           data.iloc[i,4] = "OK"
+        if data.iloc[i,9] == 30:
+           data.iloc[i,17] = "OK"
         else:
-           data.iloc[i,4] = "Revisar"
+           data.iloc[i,17] = "Revisar"
     
     
     
@@ -865,7 +865,8 @@ def main(opt):
         #empleados_centro=employees[employees.identificacion.astype(str).isin(data_selection.documento_de_identificacion.astype(str))]
          data_selection=pd.merge(empleados_centro.astype(str),data_selection.astype(str),how='left',left_on='identificacion',right_on='documento_de_identificacion')
          data_selection['dias_laborados']=data_selection['dias_laborados'].fillna(0).astype(int)
-         data_selection['nombre_del_empleado']=data_selection['empleado_x']
+         #st.write(data_selection)
+         #data_selection['nombre_del_empleado']=data_selection['empleado_x']
          por_tra = (data_selection['dias_laborados']/30)*100
          data_selection['Por_tra']=por_tra
         
@@ -930,6 +931,7 @@ def main(opt):
         #st.plotly_chart(fig,use_container_width=True)
 #-----------------------------------------------------------------------------
          st.header("Reporte Novedades")
+         st.write(data)
          data['fecha_inicial_novedad'] = pd.to_datetime(data['fecha_inicial_novedad']) 
          data['fecha_inicial_novedad']=data['fecha_inicial_novedad'].dt.strftime('%Y-%m-%d')
          data['fecha_final_novedad'] = pd.to_datetime(dataf['fecha_final_novedad']) 

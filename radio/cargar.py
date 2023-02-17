@@ -378,7 +378,7 @@ def cargar_formularios_6():
       dict_data = eval(trans_data)
       F_AD_24_D = pd.DataFrame(dict_data['data'])
     except:
-      F_AD_14_D= pd.DataFrame()
+      F_AD_24_D= pd.DataFrame()
     try:
       response = requests.get(f"{BASE_URL}/api/v1/return_control", headers=headers)
       trans_data = _normalize(response.text)

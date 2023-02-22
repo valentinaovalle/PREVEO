@@ -87,7 +87,7 @@ def main(opt):
     #men=df.groupby(['fecha_de_pago'],as_index=False)['valor_rembolso'].sum
     #-----------------------------------------------------------------------------
     #data = pd.read_excel("C:/Users/VALE/Dropbox/PC/Documents/LUCRO/prueba.xlsx")
-    data=data.drop(["codigo_centro_de_costos"],axis=1) 
+    #data=data.drop(["codigo_centro_de_costos"],axis=1) 
     data.columns = data.columns.str.replace(' ', '_') 
     data['fecha_inicial_novedad'] = pd.to_datetime(data['fecha_inicial_novedad'],format='%Y-%m-%d')
     
@@ -931,11 +931,12 @@ def main(opt):
         #st.plotly_chart(fig,use_container_width=True)
 #-----------------------------------------------------------------------------
          st.header("Reporte Novedades")
-         #st.write(data)
+         
          data['fecha_inicial_novedad'] = pd.to_datetime(data['fecha_inicial_novedad']) 
          data['fecha_inicial_novedad']=data['fecha_inicial_novedad'].dt.strftime('%Y-%m-%d')
          data['fecha_final_novedad'] = pd.to_datetime(dataf['fecha_final_novedad']) 
          data['fecha_final_novedad']=dataf['fecha_final_novedad'].dt.strftime('%Y-%m-%d')
+
          ms1=pd.unique(data['año_mes'])
          ms2=np.append(ms1,"Todos")
          formulario= st.multiselect(
@@ -948,6 +949,16 @@ def main(opt):
          else:
             formulario=formulario
          dataf1=data[(data.año_mes.isin(formulario))]
+         dataf1=dataf1[['nombre_del_empleado','documento_de_identificacion','fecha_ingreso_nomina','centro_de_costos',
+                        'codigo_centro_de_costos','dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
+                        'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']]
+         dataf1=dataf1.rename(columns={"nombre_del_empleado": "Empleado", "documento_de_identificacion": "Cédula","fecha_ingreso_nomina":"Fecha Ingreso Nómina",
+                                "centro_de_costos":"Nombre Proyecto","codigo_centro_de_costos":"Codigo Proyecto",
+                                "dias_a_facturar":"Dias a Facturar","dias_laborados":"Dias Laborados","tipo_de_novedad":"Tipo Novedad",
+                                "fecha_inicial_novedad":'Fecha Inicial Novedad',"fecha_final_novedad":"Fecha Final Novedad",
+                                "quien_reporta_la_novedad":"Persona Encargada del Proyecto que reporta Novedades",
+                                "observaciones":"Observaciones"})
+         #st.write('data')
          st.write(dataf1)
          def to_excel(df):
              output = BytesIO()
@@ -1006,7 +1017,7 @@ def main(opt):
                 'dias_laborados','año_mes','tipo_de_novedad','Alerta']]
 
          
-         dataf=dataf.drop(["uuid","fecha","fecha_observacion","fecha_ingreso_nomina",
+         dataf=dataf.drop(["uuid","fecha","fecha_observacion",
                            "empleado","tipo_observacion"],axis=1) 
          dataf.index = np.arange(1, len(dataf) + 1)
          
@@ -1014,8 +1025,12 @@ def main(opt):
          dataf['fecha_final_novedad']=dataf['fecha_final_novedad'].dt.strftime('%Y-%m-%d')
          dataf['fecha_final_novedad'] = pd.to_datetime(dataf['fecha_final_novedad']) 
          dataf['fecha_final_novedad']=dataf['fecha_final_novedad'].dt.strftime('%Y-%m-%d')
+         dataf=dataf[['nombre_del_empleado','documento_de_identificacion','fecha_ingreso_nomina','centro_de_costos',
+                      'codigo_centro_de_costos','dias_a_facturar','dias_laborados','tipo_de_novedad','fecha_inicial_novedad',
+                      'fecha_final_novedad','quien_reporta_la_novedad','observaciones','Alerta']]
          dataf.rename(columns={'quien_reporta_la_novedad':'Quien reporta la novedad',
-                        'nombre_del_empleado':'Nombre del Empleado','documento_de_identificacion':'Documento de Identificacion','centro_de_costos':'Centro de Costos',
+                        'nombre_del_empleado':'Empleado','documento_de_identificacion':'Cédula',
+                        'centro_de_costos':'Nombre Proyecto','fecha_ingreso_nomina':'Fecha Ingreso Nómina','codigo_centro_de_costos':'Codigo Proyecto',
                         'tipo_de_novedad':'Tipo de Novedad','año_mes':'Año-Mes','dias_a_facturar':'Dias a Facturar',
                         'dias_laborados':'Dias Laborados','fecha_inicial_novedad':'Fecha Inicial Novedad',
                         'fecha_final_novedad':'Fecha Final Novedad'},
@@ -1049,14 +1064,14 @@ def main(opt):
                                     file_name= 'df_test.xlsx')  
          
          
-         a=list(dataf['Centro de Costos'].unique())
+         a=list(dataf['Nombre Proyecto'].unique())
          c=list(cost_center['centro_de_costo'].unique())
          cen_sin=list(set(c)-set(a))
          
-         cc_nulos=pd.DataFrame(cen_sin,columns=['Centros De Costo'])
+         cc_nulos=pd.DataFrame(cen_sin,columns=['Nombre Proyecto'])
          cc_nulos.index = np.arange(1, len(cc_nulos) + 1)
         
-         d=list(dataf['Nombre del Empleado'].unique())
+         d=list(dataf['Empleado'].unique())
          e=list(employees['empleado'].unique())
          em_sin=list(set(e)-set(d))
          em_nulos=pd.DataFrame(em_sin,columns=['Empleados'])
